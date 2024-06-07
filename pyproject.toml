@@ -5,6 +5,13 @@ description = "Makes your CSS so fresh, so clean."
 authors = ["adamghill <adamghill@yahoo.com>"]
 license = "MIT"
 readme = "README.md"
+repository = "https://github.com/adamghill/refreshcss/"
+homepage = "https://github.com/adamghill/refreshcss/"
+documentation = "https://github.com/adamghill/refreshcss/"
+keywords = ["django", "python", "css", "html"]
+
+[tool.poetry.urls]
+"Funding" = "https://github.com/sponsors/adamghill"
 
 [tool.poetry.dependencies]
 python = "^3.10"
