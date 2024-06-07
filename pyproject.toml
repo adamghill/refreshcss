@@ -95,6 +95,10 @@ pythonpath = [
 cmd = "pytest"
 help = "Run pytest"
 
+[tool.poe.tasks.publish]
+cmd = { shell = "poetry publish --build -r test && poetry publish" }
+help = "Publish"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
