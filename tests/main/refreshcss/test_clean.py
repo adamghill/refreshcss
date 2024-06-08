@@ -2,6 +2,7 @@ from os import getcwd
 
 from refreshcss import RefreshCSS
 from refreshcss.html.site import Site
+
 from tests.utils import assert_css
 
 
@@ -21,7 +22,7 @@ def _get_site(monkeypatch, class_attribute_values=None, id_attribute_values=None
     return site
 
 
-def test_refresh():
+def test_clean():
     expected = """td div.pos {
     color: green;
     width: 20px;
