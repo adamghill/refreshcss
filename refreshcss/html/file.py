@@ -2,7 +2,7 @@ import re
 from dataclasses import dataclass
 from hashlib import md5
 from pathlib import Path
-from typing import Union
+from typing import Optional, Union
 
 # TODO: Use html.parser and look for class or id
 CLASS_RE = re.compile(r"<(\w+)\sclass=([^>]+)")
@@ -19,8 +19,8 @@ class File:
     id_attribute_values: set
     # files: list
     # file_type: int  # TODO: enum: javascript / html
-    _bytes: bytes
-    _text: str
+    _bytes: Optional[bytes]
+    _text: Optional[str]
 
     def __init__(self, path: Union[str, Path]):
         if isinstance(path, str):

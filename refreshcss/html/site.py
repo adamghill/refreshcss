@@ -10,11 +10,11 @@ class Site:
     id_attribute_values: set = field(default_factory=set)
     template_paths: dict = field(default_factory=dict)
 
-    def __init__(self, *template_path: str | Path):
+    def __init__(self):
         self.class_attribute_values = set()
         self.id_attribute_values = set()
         self.template_paths = {}
-        self._file_paths = template_path
+        self._file_paths = []
 
     def get_django_template_paths(self) -> list[Path]:
         """
@@ -31,9 +31,12 @@ class Site:
 
         directories: list[str] = []
 
-        for engine in template.loader.engines.all():
-            # Exclude pip installed site package template directories
-            directories.extend(directory for directory in engine.template_dirs if "site-packages" not in str(directory))
+        if hasattr(template, "loader"):
+            for engine in template.loader.engines.all():
+                # Exclude pip installed site package template directories
+                directories.extend(
+                    directory for directory in engine.template_dirs if "site-packages" not in str(directory)
+                )
 
         files: list[Path] = []
 

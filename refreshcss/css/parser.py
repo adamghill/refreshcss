@@ -13,14 +13,16 @@ def _handle_css_rule_part(css_rule_part: str, css_classes: set, ids: set) -> boo
 
         return True
 
+    return False
+
 
 def _get_css_classes_and_ids(css_rule: str) -> tuple[set, set]:
     """
     Get the CSS classes and IDs referenced
     """
 
-    css_classes = set()
-    ids = set()
+    css_classes: set[str] = set()
+    ids: set[str] = set()
 
     bracket_count = 0
 
@@ -134,7 +136,7 @@ def parse(css_text: str, html_classes: set[str], html_ids: set[str]) -> str:
     css_text = _pop_media_queries_out(css_text)
 
     for match in re.finditer(CSS_RULE_RE, css_text):
-        css_classes = set()
+        css_classes: set[str] = set()
         css_rule = match.group(0).strip()
 
         # TODO: Handle html_ids
