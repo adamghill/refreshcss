@@ -1,4 +1,3 @@
-import pytest
 from refreshcss.css.parser import parse
 
 from tests.utils import assert_css
