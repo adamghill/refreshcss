@@ -82,7 +82,7 @@ def test_clean_bulma_full(monkeypatch):
     site = _get_site(monkeypatch, class_attribute_values={"px-2"})
 
     with open(f"{getcwd()}/tests/static/css/bulma-0.9.3.min.css") as f:
-        actual = RefreshCSS(site=site).clean(f.read())
+        actual = RefreshCSS(site=site).clean_v2(f.read())
 
     assert_css(expected, actual)
 
@@ -103,7 +103,7 @@ def test_clean_bulma_2(monkeypatch):
     background-color: #fafafa; padding: 3rem 1.5rem 6rem
 }"""
 
-    actual = RefreshCSS(site=site).clean(css_text)
+    actual = RefreshCSS(site=site).clean_v2(css_text)
 
     assert_css(expected, actual)
 
@@ -135,7 +135,7 @@ def test_clean_bulma_3(monkeypatch):
     background-color: #fafafa; padding: 3rem 1.5rem 6rem
 }"""
 
-    actual = RefreshCSS(site=site).clean(css_text)
+    actual = RefreshCSS(site=site).clean_v2(css_text)
 
     assert_css(expected, actual)
 
