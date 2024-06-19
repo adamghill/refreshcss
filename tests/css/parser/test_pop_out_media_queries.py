@@ -1,4 +1,4 @@
-from refreshcss.css.parser import _pop_media_queries_out
+from refreshcss.css.parser_v1 import _pop_media_queries_out
 
 from tests.utils import assert_css
 

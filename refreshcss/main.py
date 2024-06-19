@@ -1,4 +1,4 @@
-from refreshcss.css.parser import parse as parse_css
+from refreshcss.css.parser_v1 import parse as parse_v1
 from refreshcss.css.parser_v2 import parse as parse_v2
 from refreshcss.html.site import Site
 
@@ -12,11 +12,11 @@ class RefreshCSS:
             self.site.parse()
 
     def clean(self, css_text: str) -> str:
-        fresh_css_text = parse_css(css_text, self.site.class_attribute_values, self.site.id_attribute_values)
+        fresh_css_text = parse_v2(css_text, self.site.class_attribute_values, self.site.id_attribute_values)
 
         return fresh_css_text
 
-    def clean_v2(self, css_text: str) -> str:
-        fresh_css_text = parse_v2(css_text, self.site.class_attribute_values, self.site.id_attribute_values)
+    def clean_v1(self, css_text: str) -> str:
+        fresh_css_text = parse_v1(css_text, self.site.class_attribute_values, self.site.id_attribute_values)
 
         return fresh_css_text

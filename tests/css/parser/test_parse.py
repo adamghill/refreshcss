@@ -1,4 +1,4 @@
-from refreshcss.css.parser import parse
+from refreshcss.css.parser_v1 import parse
 
 from tests.utils import assert_css
 

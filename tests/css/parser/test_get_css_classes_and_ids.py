@@ -1,6 +1,6 @@
 from unittest.mock import ANY
 
-from refreshcss.css.parser import _get_css_classes_and_ids
+from refreshcss.css.parser_v1 import _get_css_classes_and_ids
 
 
 def test_get_css_classes_and_ids_one_class():
