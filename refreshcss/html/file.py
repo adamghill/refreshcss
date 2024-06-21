@@ -3,7 +3,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Union
 
-# TODO: Use html.parser and look for class or id, although I'm pretty sure that won't work for Django templates
 CLASS_RE = re.compile(r"<(\w+)\sclass=([^>]+)")
 
 DJANGO_STATEMENT_RE = re.compile(r"\{\%.*?\%\}")
@@ -34,6 +33,8 @@ class File:
     @property
     def classes(self):
         if not self._classes:
+            self._classes = set()
+
             for match in re.finditer(CLASS_RE, self._get_text()):
                 # tag_name = match.groups()[0]
                 css_class = match.groups()[1].strip()
