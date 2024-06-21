@@ -6,28 +6,35 @@ from refreshcss.html.file import File
 
 @dataclass
 class Site:
-    class_attribute_values: set = field(default_factory=set)
-    id_attribute_values: set = field(default_factory=set)
-    template_paths: dict = field(default_factory=dict)
+    classes: set = field(default_factory=set)
+    ids: set = field(default_factory=set)
 
-    def __init__(self):
-        self.class_attribute_values = set()
-        self.id_attribute_values = set()
-        self.template_paths = {}
-        self._file_paths = []
+    def get_template_paths(self):
+        # Override this is in a subclass for different implementations
+        return []
 
-    def get_django_template_paths(self) -> list[Path]:
+    def parse(self) -> None:
+        self.classes = set()
+        self.ids = set()
+
+        for template_path in self.get_template_paths():
+            file = File(template_path)
+            self.classes |= file.classes
+
+    def __repr__(self):
+        return "Site()"
+
+
+@dataclass
+class DjangoSite(Site):
+    def get_template_paths(self) -> list[Path]:
         """
-        Get a list of template paths based on what was passed in to the constructor or default
-        to the templates stored in Django template directories.
+        Get a list of template paths stored in Django template directories.
 
         From https://stackoverflow.com/a/70077633.
         """
 
         from django import template
-
-        if self._file_paths:
-            return self._file_paths
 
         directories: list[str] = []
 
@@ -45,20 +52,25 @@ class Site:
 
         return files
 
-    def parse(self) -> None:
-        self.template_paths = {}
 
-        for template_path in self.get_django_template_paths():
-            file = File(template_path)
+@dataclass
+class UrlSite(Site):
+    """A site that is represented by a URL.
 
-            if (
-                template_path not in self.template_paths
-                or self.template_paths[template_path].file_hash != file.file_hash
-            ):
-                file.parse()
+    TODO: Rename `File` to something more generic since it could be represented by URL paths.
+    """
 
-            self.template_paths[template_path] = file
-            self.class_attribute_values |= file.class_attribute_values
+    def get_template_paths(self) -> list[Path]:
+        """Get template paths for the site."""
 
-    def __repr__(self):
-        return "Site()"
+        raise NotImplementedError()
+
+
+@dataclass
+class DirectorySite(Site):
+    """A site that is represented by a directory."""
+
+    def get_template_paths(self) -> list[Path]:
+        """Get template paths for the directory."""
+
+        raise NotImplementedError()

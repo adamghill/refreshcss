@@ -1,6 +1,7 @@
 import re
 
 from refreshcss.css.rule import Rule
+from refreshcss.html.site import Site
 
 CSS_RULE_RE = re.compile(r"(([^{])+)\s*\{.*?\}", flags=re.DOTALL)
 CSS_COMMENTS_RE = re.compile(r"/\*.*?\*/", flags=re.DOTALL)
@@ -52,7 +53,7 @@ def _pop_media_queries_out(css_text: str) -> str:
     return css_text
 
 
-def parse(css_text: str, html_classes: set[str], html_ids: set[str]) -> str:
+def parse(css_text: str, site: Site) -> str:
     """Parse CSS and remove any class rules that are not in the set of CSS classes.
 
     Note: This is not an actual parser and is pretty unsophisticated, but it kind of works ok.
@@ -75,13 +76,14 @@ def parse(css_text: str, html_classes: set[str], html_ids: set[str]) -> str:
     css_text = re.sub(CSS_COMMENTS_RE, "", css_text)
 
     # Take the internal selectors for media queries and make them regular selectors for parsing
+    # This is required because CSS_RULE_RE isn't smart enough to handle media queries
     css_text = _pop_media_queries_out(css_text)
 
     for match in re.finditer(CSS_RULE_RE, css_text):
         css_rule = match.group(0).strip()
         rule = Rule(css_rule)
 
-        if rule.classes and html_classes and len(rule.classes & html_classes) == 0 or rule.classes and not html_classes:
+        if rule.classes and site.classes and len(rule.classes & site.classes) == 0 or rule.classes and not site.classes:
             refreshed_css_text = refreshed_css_text.replace(str(rule), "")
 
     refreshed_css_text = _remove_empty_media_queries(refreshed_css_text)

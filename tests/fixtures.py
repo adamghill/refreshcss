@@ -1,7 +1,7 @@
 import pytest
-from refreshcss.html.site import Site
+from refreshcss.html.site import DjangoSite
 
 
 @pytest.fixture
-def site():
-    return Site()
+def django_site():
+    return DjangoSite()

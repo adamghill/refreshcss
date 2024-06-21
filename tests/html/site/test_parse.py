@@ -1,15 +1,15 @@
 from tests.fixtures import *  # noqa: F403
 
 
-def test_parse_parsed_paths(site):
-    site.parse()
+def test_parse_parsed_paths(django_site):
+    django_site.parse()
 
-    actual = site.template_paths
+    actual = django_site.get_template_paths()
 
     assert len(actual) == 2
 
 
-def test_parse_class_attribute_values(site):
+def test_parse_classes(django_site):
     expected = {
         "pos",
         "info",
@@ -32,8 +32,7 @@ def test_parse_class_attribute_values(site):
         "section-true",
     }
 
-    site.parse()
-
-    actual = site.class_attribute_values
+    django_site.parse()
+    actual = django_site.classes
 
     assert expected == actual
