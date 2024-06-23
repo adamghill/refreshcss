@@ -137,7 +137,7 @@ sequence = ["rf", "tc", "my"]
 help = "Run all the dev things"
 
 [tool.poe.tasks.publish]
-cmd = "poetry publish --build -r test && poetry publish"
+shell = "poetry publish --build -r test && poetry publish"
 help = "Publish"
 
 [build-system]
