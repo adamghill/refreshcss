@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "refreshcss"
-version = "0.1.0"
-description = "Makes your CSS so fresh, so clean."
+version = "0.2.0"
+description = "Removes unused classes, ids, and element selectors from CSS."
 authors = ["adamghill <adamghill@yahoo.com>"]
 license = "MIT"
 readme = "README.md"

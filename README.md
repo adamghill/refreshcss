@@ -1,14 +1,19 @@
-# RefreshCSS
+# RefreshCSS 🫧
 
->Make your CSS so fresh, so clean. 🫧
+>Make your CSS so fresh, so clean.
 
-`RefreshCSS` is a Python library that removes unused styles from CSS. It is designed to be used with `django-compressor`, but it can also be used standalone.
+`RefreshCSS` is a Python library that removes unused classes, ids, and element selectors from CSS.
 
 ## 🔧 Installation
 
 `pip install refreshcss`
 
-### Integrate with django-compressor
+## ⭐️ Features
+
+- Python library to integrate in other Python projects
+- Can be used as a filter with `django-compressor` as part of minifying CSS
+
+### 🗜️ Integrate with django-compressor
 
 Add `"refreshcss.filters.RefreshCSSFilter"` to `COMPRESS_FILTERS` in the Django settings file.
 
@@ -24,9 +29,9 @@ COMPRESS_FILTERS = {
 
 ## 🤓 How does it work?
 
-1. Catalogue HTML attributes that are currently being used
-1. Catalogue CSS rules
-1. Return new CSS that only contains rules that are actively being used by the HTML
+1. Catalogue classes, ids, and elements that are currently being used in found HTML templates
+1. Catalogue classes, ids, and elements in a CSS stylesheet
+1. Return new CSS stylesheet that only contains rules that are actively being used by the HTML
 
 ## 🧐 Why?
 
@@ -44,9 +49,13 @@ Which is always the thought at the beginning of every side project... and is nev
 
 Currently no, although that is a possibility in the future.
 
-### Does this support the HTML written in the Django Template Language?
+### Does this support HTML written in the Django Template Language?
 
-Yes! That was a primary reason I built my own solution. 😅 Jinja might also be possible to support with some small tweaks, although I have not tested it.
+Yes! That was a primary reason I built my own solution. 😅 Jinja might also be possible to support with some small tweaks, although it is untested.
+
+### Is this what people mean when they say "treeshaker"?
+
+Maybe.🤷
 
 ### I found a bug!
 
