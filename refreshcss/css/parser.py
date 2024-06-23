@@ -2,6 +2,7 @@ import re
 
 from refreshcss.css.rule import Rule
 from refreshcss.html.site import Site
+from refreshcss.strings import finditer, remove_string_at
 
 CSS_RULE_RE = re.compile(r"(([^{])+)\s*\{.*?\}", flags=re.DOTALL)
 CSS_COMMENTS_RE = re.compile(r"/\*.*?\*/", flags=re.DOTALL)
@@ -16,8 +17,7 @@ def _pop_media_queries_out(css_text: str) -> str:
     ending_idx = -1
     new_css = ""
 
-    for media_match in re.finditer(r"@media", css_text):
-        starting_idx = media_match.start()
+    for starting_idx, _ in finditer("@media", css_text):
         starting_bracket_count = 0
         has_hit_an_ending_bracket = False
         starting_rule_idx = -1
@@ -79,17 +79,47 @@ def parse(css_text: str, site: Site) -> str:
     # This is required because CSS_RULE_RE isn't smart enough to handle media queries
     css_text = _pop_media_queries_out(css_text)
 
+    rules = []
+
     for match in re.finditer(CSS_RULE_RE, css_text):
         css_rule = match.group(0).strip()
         rule = Rule(css_rule)
+        rules.append(rule)
 
         # Remove any rule that is in the CSS, but is not used in the HTML for classes, elements, and ids
-        for attr in ["classes", "elements", "ids"]:
+        for attr in ["classes", "ids"]:
             site_attr = getattr(site, attr)
             rule_attr = getattr(rule, attr)
 
             if rule_attr and site_attr and len(rule_attr & site_attr) == 0 or rule_attr and not site_attr:
-                refreshed_css_text = refreshed_css_text.replace(str(rule), "")
+                refreshed_css_text = refreshed_css_text.replace(rule.value, "")
+
+    # Removing unused elements is a special case to handle a class or id being the same as an element, e.g. `.table` or `#table`
+    for rule in rules:
+        if (
+            rule.elements
+            and site.elements
+            and len(rule.elements & site.elements) == 0
+            or rule.elements
+            and not site.elements
+        ):
+            for start_idx, end_idx in finditer(rule.value, refreshed_css_text):
+                is_id_or_class = False
+
+                # Double-check that the rule is actually for elements
+                if refreshed_css_text[0] in (".", "#"):
+                    is_id_or_class = True
+
+                # Check if the matched rule in the CSS is actually an id or class selector
+                if start_idx > 0 and not is_id_or_class:
+                    if not is_id_or_class:
+                        previous_char_idx = start_idx - 1
+
+                        if refreshed_css_text[previous_char_idx] in (".", "#"):
+                            is_id_or_class = True
+
+                if not is_id_or_class:
+                    refreshed_css_text = remove_string_at(refreshed_css_text, start_idx, end_idx)
 
     refreshed_css_text = _remove_empty_media_queries(refreshed_css_text)
 

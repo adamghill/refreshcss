@@ -8,13 +8,15 @@ def assert_css(expected: str, actual: str, print_out: bool = True) -> None:
     minified_expected = _minify_css(expected)
 
     if print_out:
-        print(expected)
+        print()
+        print("`" + expected + "`")
         print(f"Expected size: {len(expected)}")
 
     minified_actual = _minify_css(actual)
 
     if print_out:
-        print(actual)
+        print()
+        print("`" + actual + "`")
         print(f"Actual size: {len(actual)}")
 
     assert minified_expected == minified_actual
