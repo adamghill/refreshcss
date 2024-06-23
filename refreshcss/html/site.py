@@ -7,6 +7,7 @@ from refreshcss.html.file import File
 @dataclass
 class Site:
     classes: set = field(default_factory=set)
+    elements: set = field(default_factory=set)
     ids: set = field(default_factory=set)
 
     def get_template_paths(self):
@@ -20,6 +21,8 @@ class Site:
         for template_path in self.get_template_paths():
             file = File(template_path)
             self.classes |= file.classes
+            self.elements |= file.elements
+            self.ids |= file.ids
 
     def __repr__(self):
         return "Site()"

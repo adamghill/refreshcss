@@ -3,51 +3,50 @@ from refreshcss.css.selector import Selector
 
 
 def test_basic():
-    expected = {Selector("body"), Selector(".test-1"), Selector(".test-2")}
+    expected = {Selector("body")}
 
-    actual = Rule(
-        """
-body { color: 'blue'; }
-
-.test-1 { color: 'red'; }
-
-.test-2 { color: 'green'; }
-"""
-    ).selectors
+    actual = Rule("body { color: 'blue'; }").selectors
 
     assert expected == actual
 
 
 def test_additional():
-    expected = {Selector(".container"), Selector(".last-commit"), Selector(".header")}
+    expected = {Selector(".container"), Selector(".last-commit")}
 
     actual = Rule(
         """
 .container,
 .last-commit {
     margin-left: 0px;
-}
-.header {
-    font-weight: bold;
 }"""
     ).selectors
 
     assert expected == actual
 
 
+def test_additional_2():
+    expected = {
+        Selector(value="td"),
+        Selector(value=".table"),
+        Selector(value=".is-warning"),
+        Selector(value=".is-alert"),
+        Selector(value="th"),
+    }
+
+    actual = Rule(
+        ".table td.is-warning,.table th.is-alert{background-color:#ffe08a;border-color:#ffe08a;color:rgba(0,0,0,.7)}"
+    ).selectors
+
+    assert expected == actual
+
+
 def test_multiple():
-    expected = {Selector(".last-commit"), Selector(".header"), Selector(".container")}
+    expected = {Selector(".last-commit"), Selector(".header")}
 
     actual = Rule(
         """
-.container {
-    margin-left: 0px;
-}
 .header.last-commit {
     min-width: 8em;
-}
-.header {
-    font-weight: bold;
 }"""
     ).selectors
 
@@ -55,18 +54,12 @@ def test_multiple():
 
 
 def test_descendant():
-    expected = {Selector(".last-commit"), Selector(".header"), Selector(".container")}
+    expected = {Selector(".last-commit"), Selector(".header")}
 
     actual = Rule(
         """
-.container {
-    margin-left: 0px;
-}
 .header .last-commit {
     min-width: 8em;
-}
-.header {
-    font-weight: bold;
 }"""
     ).selectors
 
@@ -80,9 +73,6 @@ def test_multiple_descendants():
         """
 .container .header .last-commit {
     min-width: 8em;
-}
-.header {
-    font-weight: bold;
 }"""
     ).selectors
 
@@ -106,56 +96,40 @@ def test_pseudo():
 
 
 def test_sibling():
-    expected = {Selector(".header"), Selector(".last-commit"), Selector(".container")}
+    expected = {Selector(".header"), Selector(".last-commit")}
 
     actual = Rule(
         """
-.container {
-    margin-left: 0px;
-}
 .header + .last-commit {
     min-width: 8em;
 }
-.header {
-    font-weight: bold;
-}"""
+"""
     ).selectors
 
     assert expected == actual
 
 
 def test_child():
-    expected = {Selector(".header"), Selector(".last-commit"), Selector(".container")}
+    expected = {Selector(".header"), Selector(".last-commit")}
 
     actual = Rule(
         """
-.container {
-    margin-left: 0px;
-}
 .header > .last-commit {
     min-width: 8em;
 }
-.header {
-    font-weight: bold;
-}"""
+"""
     ).selectors
 
     assert expected == actual
 
 
 def test_precede():
-    expected = {Selector(".header"), Selector(".last-commit"), Selector(".container")}
+    expected = {Selector(".header"), Selector(".last-commit")}
 
     actual = Rule(
         """
-.container {
-    margin-left: 0px;
-}
 .header ~ .last-commit {
     min-width: 8em;
-}
-.header {
-    font-weight: bold;
 }"""
     ).selectors
 
@@ -163,19 +137,14 @@ def test_precede():
 
 
 def test_column():
-    expected = {Selector(".header"), Selector(".last-commit"), Selector(".container")}
+    expected = {Selector(".header"), Selector(".last-commit")}
 
     actual = Rule(
         """
-.container {
-    margin-left: 0px;
-}
 .header || .last-commit {
     min-width: 8em;
 }
-.header {
-    font-weight: bold;
-}"""
+"""
     ).selectors
 
     assert expected == actual

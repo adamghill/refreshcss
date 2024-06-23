@@ -83,8 +83,13 @@ def parse(css_text: str, site: Site) -> str:
         css_rule = match.group(0).strip()
         rule = Rule(css_rule)
 
-        if rule.classes and site.classes and len(rule.classes & site.classes) == 0 or rule.classes and not site.classes:
-            refreshed_css_text = refreshed_css_text.replace(str(rule), "")
+        # Remove any rule that is in the CSS, but is not used in the HTML for classes, elements, and ids
+        for attr in ["classes", "elements", "ids"]:
+            site_attr = getattr(site, attr)
+            rule_attr = getattr(rule, attr)
+
+            if rule_attr and site_attr and len(rule_attr & site_attr) == 0 or rule_attr and not site_attr:
+                refreshed_css_text = refreshed_css_text.replace(str(rule), "")
 
     refreshed_css_text = _remove_empty_media_queries(refreshed_css_text)
 
