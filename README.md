@@ -53,9 +53,9 @@ Currently no, although that is a possibility in the future.
 
 Yes! That was a primary reason I built my own solution. 😅 Jinja might also be possible to support with some small tweaks, although it is untested.
 
-### Is this what people mean when they say "treeshaker"?
+### Is this what people mean when they say "treeshaking"?
 
-Maybe.🤷
+Maybe. 🤷
 
 ### I found a bug!
 
