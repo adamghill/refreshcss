@@ -17,6 +17,7 @@ class Site:
     def parse(self) -> None:
         self.classes = set()
         self.ids = set()
+        self.elements = set()
 
         for template_path in self.get_template_paths():
             file = File(template_path)

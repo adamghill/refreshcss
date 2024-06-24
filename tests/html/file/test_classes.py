@@ -3,7 +3,7 @@ from refreshcss.html.file import File
 
 
 @pytest.mark.parametrize(
-    "html, expected",
+    "text, expected",
     [
         ("<p class='after-element' style=''>", {"after-element"}),
         ('<p class="double-quotes">', {"double-quotes"}),
@@ -16,16 +16,17 @@ from refreshcss.html.file import File
         ("<element0 class='element-with-number'></p>", {"element-with-number"}),
     ],
 )
-def test_file_get_classes_from_html(html, expected, monkeypatch):
-    monkeypatch.setattr(File, "_get_text", lambda _: html)
+def test_classes_from_html(text, expected):
+    file = File(None)
+    file.text = text
 
-    actual = File(None).classes
+    actual = file.classes
 
     assert expected == actual
 
 
 @pytest.mark.parametrize(
-    "html, expected",
+    "text, expected",
     [
         # this stinks, but not much to do when using regex
         ("<p class='{% if True %}section{% endif %}' style=''>", {"section"}),
@@ -33,16 +34,17 @@ def test_file_get_classes_from_html(html, expected, monkeypatch):
         ("<p class='{{ 'whatever'|upper }} section{% endif %}' style=''>", {"section"}),
     ],
 )
-def test_file_get_classes_from_django_template_html(html, expected, monkeypatch):
-    monkeypatch.setattr(File, "_get_text", lambda _: html)
+def test_classes_from_django_template_html(text, expected):
+    file = File(None)
+    file.text = text
 
-    actual = File(None).classes
+    actual = file.classes
 
     assert expected == actual
 
 
 @pytest.mark.parametrize(
-    "html, expected",
+    "text, expected",
     [
         ("<p class='' style=''>", {"p"}),
         ('<div class="">', {"div"}),
@@ -50,16 +52,17 @@ def test_file_get_classes_from_django_template_html(html, expected, monkeypatch)
         ("<element0 class='element-with-number'></p>", {"element0"}),
     ],
 )
-def test_file_get_elements_from_html(html, expected, monkeypatch):
-    monkeypatch.setattr(File, "_get_text", lambda _: html)
+def test_elements_from_html(text, expected):
+    file = File(None)
+    file.text = text
 
-    actual = File(None).elements
+    actual = file.elements
 
     assert expected == actual
 
 
 @pytest.mark.parametrize(
-    "html, expected",
+    "text, expected",
     [
         ("<p id='first' style=''>", {"first"}),
         ('<p id="double-quotes">', {"double-quotes"}),
@@ -71,9 +74,10 @@ def test_file_get_elements_from_html(html, expected, monkeypatch):
         ("<element0 id='element-with-number'></p>", {"element-with-number"}),
     ],
 )
-def test_file_get_ids_from_html(html, expected, monkeypatch):
-    monkeypatch.setattr(File, "_get_text", lambda _: html)
+def test_ids_from_html(text, expected):
+    file = File(None)
+    file.text = text
 
-    actual = File(None).ids
+    actual = file.ids
 
     assert expected == actual

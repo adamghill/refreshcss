@@ -1,10 +1,12 @@
 import re
 from dataclasses import dataclass
+from functools import cached_property
 from pathlib import Path
 from typing import Union
 
 ID_RE = re.compile(r"<([\w-]+)\s+[^>]*id=(?P<id>[^>]+)")
-CLASS_RE = re.compile(r"<(?P<element>[\w-]+)\s+[^>]*class=(?P<class>[^>]+)")
+ELEMENT_RE = re.compile(r"<(?P<element>[\w-]+)")
+CLASS_RE = re.compile(r"<[\w-]+\s+[^>]*class=(?P<class>[^>]+)")
 
 DJANGO_STATEMENT_RE = re.compile(r"\{\%.*?\%\}")
 DJANGO_VARIABLE_RE = re.compile(r"\{\{.*?\}\}")
@@ -20,92 +22,77 @@ class File:
 
         self.path = path
 
-        self._text = None
-        self._classes = set()
-        self._ids = set()
-        self._elements = set()
+    @cached_property
+    def text(self):
+        return self.path.read_text()
 
-    def _get_text(self):
-        if not self._text:
-            self._text = self.path.read_text()
-
-        return self._text
-
-    @property
+    @cached_property
     def elements(self):
-        if not self._elements:
-            self._elements = set()
+        _elements = set()
 
-            # This is weird, but the classes property also finds elements and prevents scanning every file 3 times with
-            # regex
-            self.classes  # noqa: B018
+        for match in re.finditer(ELEMENT_RE, self.text):
+            element = match.group("element").strip()
+            _elements.add(element)
 
-        return self._elements
+        return _elements
 
-    @property
+    @cached_property
     def classes(self):
-        if not self._classes:
-            self._classes = set()
+        _classes = set()
 
-            for match in re.finditer(CLASS_RE, self._get_text()):
-                tag_name = match.group("element")
-                self._elements.add(tag_name)
+        for match in re.finditer(CLASS_RE, self.text):
+            css_class = match.group("class").strip()
+            css_class = re.sub(DJANGO_STATEMENT_RE, "", css_class)
+            css_class = re.sub(DJANGO_VARIABLE_RE, "", css_class)
 
-                css_class = match.group("class").strip()
+            potential_class_attribute_value = css_class
 
-                css_class = re.sub(DJANGO_STATEMENT_RE, "", css_class)
-                css_class = re.sub(DJANGO_VARIABLE_RE, "", css_class)
+            if css_class.startswith("'"):
+                matching_single_quote = css_class.index("'", 1)
 
-                potential_class_attribute_value = css_class
+                potential_class_attribute_value = css_class[1:matching_single_quote]
+            elif css_class.startswith('"'):
+                matching_double_quote = css_class.index('"', 1)
 
-                if css_class.startswith("'"):
-                    matching_single_quote = css_class.index("'", 1)
+                potential_class_attribute_value = css_class[1:matching_double_quote]
+            else:
+                # Assume that a space means it's a new attribute
+                potential_class_attribute_value = css_class.split(" ")[0]
 
-                    potential_class_attribute_value = css_class[1:matching_single_quote]
-                elif css_class.startswith('"'):
-                    matching_double_quote = css_class.index('"', 1)
+            for c in potential_class_attribute_value.split(" "):
+                if c:
+                    _classes.add(c)
 
-                    potential_class_attribute_value = css_class[1:matching_double_quote]
-                else:
-                    # Assume that a space means it's a new attribute
-                    potential_class_attribute_value = css_class.split(" ")[0]
+        return _classes
 
-                for c in potential_class_attribute_value.split(" "):
-                    if c:
-                        self._classes.add(c)
-
-        return self._classes
-
-    @property
+    @cached_property
     def ids(self):
-        if not self._ids:
-            self._ids = set()
+        _ids = set()
 
-            for match in re.finditer(ID_RE, self._get_text()):
-                css_id = match.group("id").strip()
+        for match in re.finditer(ID_RE, self.text):
+            css_id = match.group("id").strip()
+            css_id = re.sub(DJANGO_STATEMENT_RE, "", css_id)
+            css_id = re.sub(DJANGO_VARIABLE_RE, "", css_id)
 
-                css_id = re.sub(DJANGO_STATEMENT_RE, "", css_id)
-                css_id = re.sub(DJANGO_VARIABLE_RE, "", css_id)
+            potential_id_attribute_value = css_id
 
-                potential_id_attribute_value = css_id
+            if css_id.startswith("'"):
+                matching_single_quote = css_id.index("'", 1)
 
-                if css_id.startswith("'"):
-                    matching_single_quote = css_id.index("'", 1)
+                potential_id_attribute_value = css_id[1:matching_single_quote]
+            elif css_id.startswith('"'):
+                matching_double_quote = css_id.index('"', 1)
 
-                    potential_id_attribute_value = css_id[1:matching_single_quote]
-                elif css_id.startswith('"'):
-                    matching_double_quote = css_id.index('"', 1)
+                potential_id_attribute_value = css_id[1:matching_double_quote]
+            else:
+                # Assume that a space means it's a new attribute
+                potential_id_attribute_value = css_id.split(" ")[0]
 
-                    potential_id_attribute_value = css_id[1:matching_double_quote]
-                else:
-                    # Assume that a space means it's a new attribute
-                    potential_id_attribute_value = css_id.split(" ")[0]
+            for c in potential_id_attribute_value.split(" "):
+                if c:
+                    _ids.add(c)
 
-                for c in potential_id_attribute_value.split(" "):
-                    if c:
-                        self._ids.add(c)
-
-        return self._ids
+        return _ids
 
     def __repr__(self):
         return f"File({self.path})"

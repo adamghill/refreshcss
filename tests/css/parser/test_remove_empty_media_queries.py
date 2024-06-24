@@ -1,4 +1,4 @@
-from refreshcss.css.parser_v1 import _remove_empty_media_queries
+from refreshcss.css.parser import _remove_empty_media_queries
 
 """
 @media screen and(min-width:1408px){ }

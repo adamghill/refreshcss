@@ -1,7 +1,7 @@
 {% extends 'tests/base.html' %}
 
 {% block content %}
-<section class="{% if True %}section-true{% endif %}">
+<section class="{% if True %}section-true{% endif %}" id="content-section">
   <div class="table-container">
     <table class="table">
       {% sort_libraries data.libraries 'last_commit' as libraries %}

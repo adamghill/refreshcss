@@ -103,6 +103,9 @@ def parse(css_text: str, site: Site) -> str:
             or rule.elements
             and not site.elements
         ):
+            if "*" in rule.elements:
+                continue
+
             for start_idx, end_idx in finditer(rule.value, refreshed_css_text):
                 is_id_or_class = False
 
