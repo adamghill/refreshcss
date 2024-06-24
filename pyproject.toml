@@ -26,6 +26,12 @@ mypy = "^1.10.0"
 django-stubs = "^5.0.2"
 pytest-benchmark = "^4.0.0"
 
+[tool.poetry.group.cli.dependencies]
+click = "^8.1.7"
+
+[tool.poetry.scripts]
+refreshcss = 'refreshcss.cli:cli'
+
 [tool.ruff]
 src = ["refreshcss"]
 exclude = []
