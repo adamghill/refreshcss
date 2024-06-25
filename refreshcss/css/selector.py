@@ -8,7 +8,7 @@ class SelectorType(Enum):
     ELEMENT = 3
 
 
-@dataclass(frozen=True)
+@dataclass(frozen=True, slots=True)
 class Selector:
     """Domain object for a CSS selector."""
 

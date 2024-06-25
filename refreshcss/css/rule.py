@@ -59,7 +59,7 @@ def _get_selectors_from_rule_portion(css_rule_portion) -> set[Selector]:
     return selectors
 
 
-@dataclass
+@dataclass(frozen=True, slots=True)
 class Rule:
     """Domain object for a CSS rule which handles parsing the rule to retrieve all of its selectors.
 
@@ -69,11 +69,6 @@ class Rule:
 
     value: str
 
-    def __init__(self, rule: str):
-        self.value = rule
-        self._selectors: set[Selector] = set()
-
-    @cache  # noqa: B019
     def _get_selectors_of_type(self, selector_type: SelectorType) -> set[str]:
         """Helper method to get all selectors of a certain type.
 
@@ -116,11 +111,11 @@ class Rule:
 
         return self._get_selectors_of_type(SelectorType.ELEMENT)
 
-    @cached_property
+    @property
     def selectors(self) -> set[Selector]:
         """All selectors used in the rule."""
 
-        selectors: set[Selector] = set()
+        _selectors: set[Selector] = set()
 
         rule_length = len(self.value)
         char_idx = 0
@@ -138,7 +133,7 @@ class Rule:
                     css_rule_portion = css_rule_portion[:-1]
 
                 if css_rule_portion:
-                    selectors |= _get_selectors_from_rule_portion(css_rule_portion)
+                    _selectors |= _get_selectors_from_rule_portion(css_rule_portion)
                     starting_idx = char_idx
 
                 if c == "{":
@@ -146,7 +141,7 @@ class Rule:
 
             char_idx += 1
 
-        return selectors
+        return _selectors
 
     def __str__(self) -> str:
         return self.value
