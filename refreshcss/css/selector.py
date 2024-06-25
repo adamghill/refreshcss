@@ -6,6 +6,7 @@ class SelectorType(Enum):
     CLASS = 1
     ID = 2
     ELEMENT = 3
+    ATTRIBUTE = 4
 
 
 @dataclass(frozen=True, slots=True)
@@ -20,5 +21,7 @@ class Selector:
             return SelectorType.CLASS
         elif self.value.startswith("#"):
             return SelectorType.ID
+        elif self.value.startswith("["):
+            return SelectorType.ATTRIBUTE
         else:
             return SelectorType.ELEMENT

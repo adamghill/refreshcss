@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from functools import cache, cached_property
 
 from refreshcss.css.selector import Selector, SelectorType
 
@@ -17,6 +16,7 @@ PORTION_BREAKING_CHARACTERS = {
     ">",
     "~",
     "||",
+    "[",
 }
 ALL_BREAKING_CHARACTERS = PORTION_BREAKING_CHARACTERS | SELECTOR_BREAKABLE_CHARACTER
 
@@ -28,6 +28,7 @@ def _get_selectors_from_rule_portion(css_rule_portion) -> set[Selector]:
     portion_length = len(css_rule_portion)
     portion_idx = 0
     starting_idx = 0
+    inside_attribute_brackets = False
 
     while portion_length >= portion_idx:
         if portion_length == portion_idx:
@@ -42,7 +43,7 @@ def _get_selectors_from_rule_portion(css_rule_portion) -> set[Selector]:
 
         c = css_rule_portion[portion_idx]
 
-        if c in PORTION_BREAKING_CHARACTERS:
+        if not inside_attribute_brackets and c in PORTION_BREAKING_CHARACTERS:
             part = css_rule_portion[starting_idx:portion_idx].strip()
 
             if part and part != ",":
@@ -50,9 +51,15 @@ def _get_selectors_from_rule_portion(css_rule_portion) -> set[Selector]:
 
                 starting_idx = portion_idx
         elif c in (":",):
-            # It's the start of a pseudo class so bail
-            # TODO: Can there be more than one pseduo class?
+            # Start of a pseudo class so bail
             break
+        elif c == "]":
+            # End of an attribute so mark it
+            inside_attribute_brackets = False
+
+        if c == "[":
+            # Start of an attribute so mark it
+            inside_attribute_brackets = True
 
         portion_idx += 1
 
@@ -82,6 +89,19 @@ class Rule:
             if selector.selector_type == selector_type:
                 if selector.selector_type in (SelectorType.CLASS, SelectorType.ID):
                     _selectors.add(selector.value[1:])
+                elif selector.selector_type == SelectorType.ATTRIBUTE:
+                    attribute = selector.value[1:-1]
+
+                    operators = ("*=", "$=", "^=", "|=", "~=", "=")
+
+                    for operator in operators:
+                        operator_idx = attribute.find(operator)
+
+                        if operator_idx > -1:
+                            attribute = attribute[:operator_idx]
+                            break
+
+                    _selectors.add(attribute)
                 else:
                     _selectors.add(selector.value)
 
@@ -110,6 +130,12 @@ class Rule:
         """All elements used in the rule."""
 
         return self._get_selectors_of_type(SelectorType.ELEMENT)
+
+    @property
+    def attributes(self) -> set[str]:
+        """All attributes used in the rule."""
+
+        return self._get_selectors_of_type(SelectorType.ATTRIBUTE)
 
     @property
     def selectors(self) -> set[Selector]:

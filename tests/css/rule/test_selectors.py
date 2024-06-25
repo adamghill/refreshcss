@@ -164,3 +164,28 @@ def test_bulma_css_2():
     actual = Rule('.is-clearfix::after{clear:both;content:" ";display:table}').selectors
 
     assert expected == actual
+
+
+def test_bare_attribute():
+    expected = {Selector("[aria-label]")}
+
+    actual = Rule("[aria-label] { position: relative; }").selectors
+
+    assert expected == actual
+
+
+def test_bare_attribute_with_extra():
+    expected = {Selector("[aria-label]"), Selector('[role~="tooltip"]')}
+
+    actual = Rule('[aria-label][role~="tooltip"] { position: relative; }').selectors
+
+    assert expected == actual
+
+
+def test_element_attribute():
+    # Unsure if we want to this or `Selector('div[lang="en"]')` or add attributes to `Selector`?
+    expected = {Selector("div"), Selector('[lang="en"]')}
+
+    actual = Rule('div[lang="en"] { position: relative; }').selectors
+
+    assert expected == actual
