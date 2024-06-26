@@ -98,7 +98,7 @@ class Rule:
                         operator_idx = attribute.find(operator)
 
                         if operator_idx > -1:
-                            attribute = attribute[:operator_idx]
+                            attribute = attribute[:operator_idx].strip()
                             break
 
                     _selectors.add(attribute)

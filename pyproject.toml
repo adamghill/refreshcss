@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "refreshcss"
-version = "0.2.1"
+version = "0.3.0"
 description = "Removes unused classes, ids, and element selectors from CSS."
 authors = ["adamghill <adamghill@yahoo.com>"]
 license = "MIT"
