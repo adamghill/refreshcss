@@ -1,5 +1,6 @@
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Iterator
 
 from refreshcss.html.file import File
 
@@ -85,6 +86,15 @@ class FilesSite(Site):
     """A site that is represented by a list of files."""
 
     files: list[str] = field(default_factory=list)
+    recursive: bool = field(default=False)
 
-    def get_template_paths(self) -> list[Path]:
-        return [Path(f) for f in self.files]
+    def get_template_paths(self) -> Iterator[Path]:
+        for file in self.files:
+            path = Path(file)
+            if self.recursive:
+                try:
+                    yield from (p for p in path.rglob("*") if p.is_file())
+                except OSError:
+                    yield path
+            else:
+                yield path
