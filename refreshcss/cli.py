@@ -12,7 +12,10 @@ from refreshcss.main import RefreshCSS
 @click.version_option()
 def cli(output, recursive, css, html):
     """Remove classes, ids, and element selectors not used in HTML from CSS."""
-    css_text = css.read()
+    try:
+        css_text = css.read()
+    except UnicodeDecodeError as e:
+        raise click.BadParameter(f"'{css.name}': {e}", param_hint="CSS") from e
     site = FilesSite(html, recursive)
     site.parse()
     refresh_css = RefreshCSS(site)
