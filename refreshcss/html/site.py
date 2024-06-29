@@ -1,14 +1,15 @@
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Iterator
 
 from refreshcss.html.file import File
 
 
 @dataclass
 class Site:
-    classes: set = field(default_factory=set)
-    elements: set = field(default_factory=set)
-    ids: set = field(default_factory=set)
+    classes: set = field(default_factory=set, init=False)
+    elements: set = field(default_factory=set, init=False)
+    ids: set = field(default_factory=set, init=False)
 
     def get_template_paths(self):
         # Override this is in a subclass for different implementations
@@ -78,3 +79,22 @@ class DirectorySite(Site):
         """Get template paths for the directory."""
 
         raise NotImplementedError()
+
+
+@dataclass
+class FilesSite(Site):
+    """A site that is represented by a list of files."""
+
+    files: list[str] = field(default_factory=list)
+    recursive: bool = field(default=False)
+
+    def get_template_paths(self) -> Iterator[Path]:
+        for file in self.files:
+            path = Path(file)
+            if self.recursive:
+                try:
+                    yield from (p for p in path.rglob("*") if p.is_file())
+                except OSError:
+                    yield path
+            else:
+                yield path
