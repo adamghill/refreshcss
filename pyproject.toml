@@ -15,6 +15,10 @@ keywords = ["django", "python", "css", "html"]
 
 [tool.poetry.dependencies]
 python = "^3.10"
+click = { version = "^8.1.7", optional = true }
+
+[tool.poetry.extras]
+cli = ["click"]
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2.1"
@@ -25,9 +29,6 @@ pytest-cov = "^5.0.0"
 mypy = "^1.10.0"
 django-stubs = "^5.0.2"
 pytest-benchmark = "^4.0.0"
-
-[tool.poetry.group.cli.dependencies]
-click = "^8.1.7"
 
 [tool.poetry.scripts]
 refreshcss = 'refreshcss.cli:cli'
