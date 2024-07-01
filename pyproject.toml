@@ -104,42 +104,6 @@ pythonpath = [
   "site"
 ]
 
-[tool.poe.tasks.t]
-cmd = "pytest"
-help = "Run pytest"
-
-[tool.poe.tasks.tb]
-cmd = "pytest tests/benchmarks/ --benchmark-autosave --benchmark-only"
-help = "Run Python unit tests with benchmarks"
-
-[tool.poe.tasks.tbc]
-cmd = "pytest tests/benchmarks/ --benchmark-only --benchmark-compare"
-help = "Run Python unit tests with compared benchmarks"
-
-[tool.poe.tasks.tc]
-cmd = "pytest --cov=refreshcss"
-help = "Run tests with coverage"
-
-[tool.poe.tasks.cr]
-cmd = "coverage report"
-help = "Show coverage report"
-
-[tool.poe.tasks.my]
-cmd = "mypy ."
-help = "Run mypy"
-
-[tool.poe.tasks.rf]
-cmd = "ruff check ."
-help = "Run ruff"
-
-[tool.poe.tasks.tm]
-sequence = ["rf", "tc", "my"]
-help = "Run all the dev things"
-
-[tool.poe.tasks.publish]
-shell = "poetry publish --build -r test && poetry publish"
-help = "Publish"
-
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
