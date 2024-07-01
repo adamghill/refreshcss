@@ -120,7 +120,6 @@ def test_pop_media_queries_out_4():
 """
 
     actual = _pop_media_queries_out(css_text)
-    print(actual)
 
     assert_css(expected, actual)
 
@@ -152,6 +151,5 @@ def test_pop_media_queries_out_5():
 """
 
     actual = _pop_media_queries_out(css_text)
-    print(actual)
 
     assert_css(expected, actual)

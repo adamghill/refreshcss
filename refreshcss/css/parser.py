@@ -94,7 +94,8 @@ def parse(css_text: str, site: Site) -> str:
             if rule_attr and site_attr and len(rule_attr & site_attr) == 0 or rule_attr and not site_attr:
                 refreshed_css_text = refreshed_css_text.replace(rule.value, "")
 
-    # Removing unused elements is a special case to handle a class or id being the same as an element, e.g. `.table` or `#table`
+    # Removing unused elements is a special case to handle a class or id being the same as an element,
+    # e.g. `.table` or `#table`
     for rule in rules:
         if (
             rule.elements

@@ -1,3 +1,5 @@
+# ruff: noqa: T201
+
 from refreshcss.html.site import Site
 
 
@@ -7,7 +9,7 @@ def _minify_css(txt: str) -> str:
     return txt.replace(" ", "").replace("\n", "")
 
 
-def assert_css(expected: str, actual: str, print_out: bool = True) -> None:
+def assert_css(expected: str, actual: str, print_out: bool = True) -> None:  # noqa: FBT001, FBT002
     minified_expected = _minify_css(expected)
 
     if print_out:
