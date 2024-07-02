@@ -8,10 +8,17 @@
 
 `pip install refreshcss`
 
+or
+
+`pip install refreshcss[cli]`
+
+if you want to use the command-line interface.
+
 ## ⭐️ Features
 
 - Python library to integrate in other Python projects
 - Can be used as a filter with `django-compressor` as part of minifying CSS
+- Can be used via command-line interface, for example in CI
 
 ### 🗜️ Integrate with django-compressor
 
@@ -25,6 +32,22 @@ COMPRESS_FILTERS = {
     ],
     "js": [...],
 }
+```
+
+### ⌨️ Command-line interface
+
+```sh
+Usage: refreshcss [OPTIONS] CSS HTML...
+
+  Remove classes, ids, and element selectors not used in HTML from CSS.
+
+Options:
+  -o, --output FILENAME  Write to file instead of stdout.
+  -R, -r, --recursive    Recursively search subdirectories listed.
+  --encoding TEXT        Character encoding to use when reading files. If not
+                         specified, the encoding will be guessed.
+  --version              Show the version and exit.
+  --help                 Show this message and exit.
 ```
 
 ## 🤓 How does it work?
