@@ -21,7 +21,7 @@ tests = ["mypy (>=0.800)", "pytest", "pytest-asyncio"]
 name = "charset-normalizer"
 version = "3.3.2"
 description = "The Real First Universal Charset Detector. Open, modern and actively maintained alternative to Chardet."
-optional = true
+optional = false
 python-versions = ">=3.7.0"
 files = [
     {file = "charset-normalizer-3.3.2.tar.gz", hash = "sha256:f30c3cb33b24454a82faecaf01b19c18562b1e89558fb6c56de4d9118a032fd5"},
@@ -120,7 +120,7 @@ files = [
 name = "click"
 version = "8.1.7"
 description = "Composable command line interface toolkit"
-optional = true
+optional = false
 python-versions = ">=3.7"
 files = [
     {file = "click-8.1.7-py3-none-any.whl", hash = "sha256:ae74fb96c20a0277a1d615f1e4d73c8414f5a98db8b799a7931d1582f3390c28"},
@@ -673,4 +673,4 @@ cli = ["charset-normalizer", "click"]
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.10"
-content-hash = "7573625372b177dd3d185d2e05bc62669dc552f2b531e0e6958850a82de04cab"
+content-hash = "2b914e46a2b0ccd0abee284b1470e4be4aa1879bfc145d15beef9a8c6179b231"

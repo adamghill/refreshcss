@@ -30,6 +30,8 @@ pytest-cov = "^5.0.0"
 mypy = "^1.10.0"
 django-stubs = "^5.0.2"
 pytest-benchmark = "^4.0.0"
+click = "^8.1.7"
+charset-normalizer = "^3.3.2"
 
 [tool.poetry.scripts]
 refreshcss = 'refreshcss.cli:cli'
