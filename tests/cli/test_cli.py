@@ -75,6 +75,38 @@ def test_cli_recursive():
     assert_css(expected, result.output)
 
 
+def test_cli_encoding():
+    runner = CliRunner()
+    result = runner.invoke(
+        cli,
+        [
+            "--encoding",
+            "utf-8",
+            "-r",
+            "tests/static/css/styles.css",
+            "tests/templates/",
+        ],
+    )
+    assert result.exit_code == 0
+    assert_css(expected, result.output)
+
+
+def test_cli_invalid_encoding():
+    runner = CliRunner()
+    result = runner.invoke(
+        cli,
+        [
+            "--encoding",
+            "foobar",
+            "-r",
+            "tests/static/css/styles.css",
+            "tests/templates/",
+        ],
+    )
+    assert result.exit_code == 2
+    assert "Error: Invalid value for encoding" in result.output
+
+
 def test_cli_output_file():
     runner = CliRunner()
     base_path = Path.cwd()
@@ -90,4 +122,4 @@ def test_cli_output_file():
             ],
         )
         assert result.exit_code == 0
-        assert_css(expected, Path("output.css").read_text())
+        assert_css(expected, Path("output.css").read_text(encoding="utf-8"))

@@ -2,7 +2,9 @@ import re
 from dataclasses import dataclass
 from functools import cached_property
 from pathlib import Path
-from typing import Union
+from typing import Optional, Union
+
+from refreshcss.utils import read_text
 
 ID_RE = re.compile(r"<([\w-]+)\s+[^>]*id=(?P<id>[^>]+)")
 ELEMENT_RE = re.compile(r"<(?P<element>[\w-]+)")
@@ -15,16 +17,18 @@ DJANGO_VARIABLE_RE = re.compile(r"\{\{.*?\}\}")
 @dataclass
 class File:
     path: Path
+    encoding: Optional[str]
 
-    def __init__(self, path: Union[str, Path]):
+    def __init__(self, path: Union[str, Path], encoding: Optional[str] = None):
         if isinstance(path, str):
             path = Path(path)
 
         self.path = path
+        self.encoding = encoding
 
     @cached_property
     def text(self):
-        return self.path.read_text()
+        return read_text(self.path, encoding=self.encoding)
 
     @cached_property
     def elements(self):

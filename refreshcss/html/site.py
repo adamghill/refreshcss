@@ -1,6 +1,7 @@
 from dataclasses import dataclass, field
+from functools import cached_property
 from pathlib import Path
-from typing import Iterator
+from typing import Iterator, Optional
 
 from refreshcss.html.file import File
 
@@ -10,6 +11,10 @@ class Site:
     classes: set = field(default_factory=set, init=False)
     elements: set = field(default_factory=set, init=False)
     ids: set = field(default_factory=set, init=False)
+
+    @property
+    def encoding(self) -> Optional[str]:
+        return None
 
     def get_template_paths(self):
         # Override this is in a subclass for different implementations
@@ -21,7 +26,7 @@ class Site:
         self.elements = set()
 
         for template_path in self.get_template_paths():
-            file = File(template_path)
+            file = File(template_path, self.encoding)
             self.classes |= file.classes
             self.elements |= file.elements
             self.ids |= file.ids
@@ -32,6 +37,11 @@ class Site:
 
 @dataclass
 class DjangoSite(Site):
+    @cached_property
+    def encoding(self) -> Optional[str]:
+        from django.conf import settings
+        return settings.DEFAULT_CHARSET
+
     def get_template_paths(self) -> list[Path]:
         """
         Get a list of template paths stored in Django template directories.
@@ -87,6 +97,7 @@ class FilesSite(Site):
 
     files: list[str] = field(default_factory=list)
     recursive: bool = field(default=False)
+    encoding: Optional[str] = field(default=None)
 
     def get_template_paths(self) -> Iterator[Path]:
         for file in self.files:

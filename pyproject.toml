@@ -16,9 +16,10 @@ keywords = ["django", "python", "css", "html"]
 [tool.poetry.dependencies]
 python = "^3.10"
 click = { version = "^8.1.7", optional = true }
+charset-normalizer = {version = "^3.3.2", optional = true}
 
 [tool.poetry.extras]
-cli = ["click"]
+cli = ["click", "charset-normalizer"]
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.2.1"
