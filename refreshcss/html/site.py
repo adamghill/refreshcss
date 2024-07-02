@@ -1,7 +1,7 @@
 from dataclasses import dataclass, field
 from functools import cached_property
 from pathlib import Path
-from typing import Iterator, Optional
+from typing import Iterable, Iterator, Optional
 
 from refreshcss.html.file import File
 
@@ -93,9 +93,9 @@ class DirectorySite(Site):
 
 @dataclass
 class FilesSite(Site):
-    """A site that is represented by a list of files."""
+    """A site that is represented by a list or tuple of files."""
 
-    files: list[str] = field(default_factory=list)
+    files: Iterable[str] = field(default_factory=list)
     recursive: bool = field(default=False)
     encoding: Optional[str] = field(default=None)
 
