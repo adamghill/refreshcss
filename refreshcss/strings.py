@@ -1,4 +1,4 @@
-from typing import Generator
+from collections.abc import Generator
 
 
 def remove_string_at(s, start_idx, end_idx) -> str:

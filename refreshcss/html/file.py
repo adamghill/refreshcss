@@ -2,7 +2,6 @@ import re
 from dataclasses import dataclass
 from functools import cached_property
 from pathlib import Path
-from typing import Union
 
 ID_RE = re.compile(r"<([\w-]+)\s+[^>]*id=(?P<id>[^>]+)")
 ELEMENT_RE = re.compile(r"<(?P<element>[\w-]+)")
@@ -16,7 +15,7 @@ DJANGO_VARIABLE_RE = re.compile(r"\{\{.*?\}\}")
 class File:
     path: Path
 
-    def __init__(self, path: Union[str, Path]):
+    def __init__(self, path: str | Path):
         if isinstance(path, str):
             path = Path(path)
 
