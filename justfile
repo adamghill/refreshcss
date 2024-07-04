@@ -1,39 +1,65 @@
-set dotenv-load
-set positional-arguments
 set quiet
+set dotenv-load
+set export
 
-default:
-    just --list
+# List commands
+_default:
+    just --list --unsorted --justfile {{justfile()}} --list-heading $'Available commands:\n'
+  
+# Install dependencies
+bootstrap:
+  poetry install
 
-# Lint the code
-lint *args='.':
-  ruff check $1
+# Set up the project
+setup:
+  brew install pipx
+  pipx ensurepath
+  pipx install poetry
+  pipx install ruff
+  pipx install mypy
 
-# Type-check the code
-type *args='.':
-  mypy $1
+# Update the project
+update:
+  just lock
+  poetry install
 
-# Benchmark the code
+# Lock the dependencies
+lock:
+  poetry lock
+
+# Lint the project
+lint *ARGS='.':
+  -ruff check {{ ARGS }}
+
+# Check the types in the project
+type *ARGS='.':
+  -mypy {{ ARGS }}
+
+# Benchmark the project
 benchmark:
-  pytest tests/benchmarks/ --benchmark-only --benchmark-compare
+  -poetry run pytest tests/benchmarks/ --benchmark-only --benchmark-compare
 
 # Run the tests
-test *args='':
-  poetry run pytest $1
+test *ARGS='':
+  -poetry run pytest {{ ARGS }}
+
+alias t := test
 
 # Run coverage on the code
-cov:
-  poetry run pytest --cov=refreshcss
+coverage:
+  -poetry run pytest --cov=refreshcss
 
 # Run all the dev things
-dev: lint type cov
-  echo ""
+dev:
+  just lint
+  just type
+  just coverage
 
 # Build the package
 build:
   poetry build
 
-# Publish the package to PyPI
-publish: build
+# Build and publish the package to test PyPI and prod PyPI
+publish:
   poetry publish --build -r test
   poetry publish
