@@ -6,7 +6,7 @@ from refreshcss.html.site import Site
 def _minify_css(txt: str) -> str:
     # Remove all spaces and new lines (even if it isn't valid CSS) because just trying see that the
     # actual content is the same
-    return txt.replace(" ", "").replace("\n", "")
+    return txt.replace(" ", "").replace("\r", "").replace("\n", "")
 
 
 def assert_css(expected: str, actual: str, print_out: bool = True) -> None:  # noqa: FBT001, FBT002
