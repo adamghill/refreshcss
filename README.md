@@ -97,6 +97,13 @@ This project is supported by GitHub [Sponsors](https://github.com/sponsors/adamg
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
 <!-- prettier-ignore-start -->
 <!-- markdownlint-disable -->
+<table>
+  <tbody>
+    <tr>
+      <td align="center" valign="top" width="14.28%"><a href="https://git.boelz.eu/tmb/"><img src="https://avatars.githubusercontent.com/u/641522?v=4?s=100" width="100px;" alt="Tobias Bölz"/><br /><sub><b>Tobias Bölz</b></sub></a><br /><a href="#code-tobiasmboelz" title="Code">💻</a> <a href="#doc-tobiasmboelz" title="Documentation">📖</a> <a href="#test-tobiasmboelz" title="Tests">⚠️</a></td>
+    </tr>
+  </tbody>
+</table>
 
 <!-- markdownlint-restore -->
 <!-- prettier-ignore-end -->
