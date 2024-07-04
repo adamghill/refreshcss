@@ -1,4 +1,23 @@
 {
   "projectName": "refreshcss",
-  "projectOwner": "adamghill"
+  "projectOwner": "adamghill",
+  "files": [
+    "README.md"
+  ],
+  "commitType": "docs",
+  "commitConvention": "angular",
+  "contributorsPerLine": 7,
+  "contributors": [
+    {
+      "login": "tobiasmboelz",
+      "name": "Tobias Bölz",
+      "avatar_url": "https://avatars.githubusercontent.com/u/641522?v=4",
+      "profile": "https://git.boelz.eu/tmb/",
+      "contributions": [
+        "code",
+        "doc",
+        "test"
+      ]
+    }
+  ]
 }
