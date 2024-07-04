@@ -33,7 +33,7 @@ lint *ARGS='.':
 
 # Check the types in the project
 type *ARGS='':
-  -mypy {{ ARGS }}
+  -poetry run mypy {{ ARGS }}  # need to run through poetry to see installed dependencies
 
 # Benchmark the project
 benchmark:

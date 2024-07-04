@@ -108,6 +108,10 @@ files = [
   "refreshcss"
 ]
 
+[[tool.mypy.overrides]]
+module = "compressor.*"
+ignore_missing_imports = true
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
