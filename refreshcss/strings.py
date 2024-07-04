@@ -1,7 +1,9 @@
-from typing import Generator
+from collections.abc import Generator
 
 
-def remove_string_at(s, start_idx, end_idx) -> str:
+def remove_string_at(s: str, start_idx: int, end_idx: int) -> str:
+    """Removes a substring from `s` from the start to the end index."""
+
     return s[0:start_idx] + s[end_idx:]
 
 

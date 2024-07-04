@@ -3,8 +3,8 @@ from dataclasses import dataclass
 from functools import cached_property
 from pathlib import Path
 from typing import Optional, Union
-
 from refreshcss.utils import read_text
+
 
 ID_RE = re.compile(r"<([\w-]+)\s+[^>]*id=(?P<id>[^>]+)")
 ELEMENT_RE = re.compile(r"<(?P<element>[\w-]+)")

@@ -4,6 +4,8 @@
 
 `RefreshCSS` is a Python library that removes unused classes, ids, and element selectors from CSS.
 
+[![All Contributors](https://img.shields.io/github/all-contributors/adamghill/refreshcss?color=ee8449&style=flat-square)](#contributors)
+
 ## 🔧 Installation
 
 `pip install refreshcss`
@@ -112,3 +114,14 @@ This project is supported by GitHub [Sponsors](https://github.com/sponsors/adamg
     <img src="https://opensource.nyc3.cdn.digitaloceanspaces.com/attribution/assets/SVG/DO_Logo_horizontal_blue.svg" width="201px">
   </a>
 </p>
+
+## 🥳 Contributors
+
+<!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+
+<!-- markdownlint-restore -->
+<!-- prettier-ignore-end -->
+
+<!-- ALL-CONTRIBUTORS-LIST:END -->
