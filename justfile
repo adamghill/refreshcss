@@ -32,7 +32,7 @@ lint *ARGS='.':
   -ruff check {{ ARGS }}
 
 # Check the types in the project
-type *ARGS='.':
+type *ARGS='':
   -mypy {{ ARGS }}
 
 # Benchmark the project
