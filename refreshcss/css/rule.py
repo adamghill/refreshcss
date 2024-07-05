@@ -1,5 +1,6 @@
 from dataclasses import dataclass
 
+from refreshcss.css.at import At
 from refreshcss.css.selector import Selector, SelectorType
 
 SELECTOR_BREAKABLE_CHARACTER = {
@@ -9,6 +10,8 @@ SELECTOR_BREAKABLE_CHARACTER = {
     "{",
     "}",
     ":",
+    # "@",
+    # ";",
 }
 PORTION_BREAKING_CHARACTERS = {
     ".",
@@ -152,9 +155,11 @@ class Rule:
 
             if c in SELECTOR_BREAKABLE_CHARACTER:
                 css_rule_portion = self.value[starting_idx:char_idx].strip()
+
                 # Remove extraneous commas
                 if css_rule_portion.startswith(","):
                     css_rule_portion = css_rule_portion[1:]
+
                 if css_rule_portion.endswith(","):
                     css_rule_portion = css_rule_portion[:-1]
 
@@ -168,6 +173,37 @@ class Rule:
             char_idx += 1
 
         return _selectors
+
+    @property
+    def ats(self) -> set[At]:
+        """All at-rules used in the rule."""
+
+        _ats: set[At] = set()
+
+        rule_length = len(self.value)
+        char_idx = 0
+        starting_idx = 0
+        inside_at_rule = False
+
+        while rule_length - 1 >= char_idx:
+            c = self.value[char_idx]
+
+            if c in "@":
+                inside_at_rule = True
+                starting_idx = char_idx
+
+            char_idx += 1
+
+            if c in ";":
+                inside_at_rule = False
+
+                css_rule_portion = self.value[starting_idx : char_idx + 1].strip()
+                _ats.add(At(css_rule_portion))
+
+            if inside_at_rule:
+                continue
+
+        return _ats
 
     def __str__(self) -> str:
         return self.value

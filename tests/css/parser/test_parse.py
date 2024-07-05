@@ -23,3 +23,27 @@ body { color: 'blue'; }
     actual = parse(css_text, site)
 
     assert_css(expected, actual)
+
+
+def test_parse_at_rule(monkeypatch):
+    expected = """@charset "UTF-8";
+
+body { color: 'blue'; }
+
+.test-1 { color: 'red'; }
+"""
+
+    css_text = """@charset "UTF-8";
+
+body { color: 'blue'; }
+
+.test-1 { color: 'red'; }
+
+.test-2 { color: 'green'; }
+"""
+
+    site = get_site(monkeypatch, classes={"test-1"}, elements={"body"})
+
+    actual = parse(css_text, site)
+
+    assert_css(expected, actual)

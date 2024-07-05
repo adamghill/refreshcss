@@ -189,3 +189,13 @@ def test_element_attribute():
     actual = Rule('div[lang="en"] { position: relative; }').selectors
 
     assert expected == actual
+
+
+def test_at_rule():
+    # @ rules should not show up in selectors
+
+    expected = set()
+
+    actual = Rule('@charset "utf-8";').selectors
+
+    assert expected == actual
