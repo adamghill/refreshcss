@@ -16,7 +16,6 @@ setup:
   pipx ensurepath
   pipx install poetry
   pipx install ruff
-  pipx install mypy
 
 # Update the project
 update:

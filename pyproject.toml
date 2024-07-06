@@ -26,6 +26,7 @@ pytest-benchmark = "^4"
 django = "^5"
 django-compressor = "^4"
 django-stubs = "^5"
+mypy = "^1"
 
 [tool.poetry.extras]
 cli = ["click", "charset-normalizer"]
