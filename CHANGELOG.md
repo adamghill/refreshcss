@@ -1,3 +1,8 @@
+## 0.4.0
+
+- Add CLI by ([#18](https://github.com/adamghill/refreshcss/pull/18) by [tobiasmboelz](https://github.com/tobiasmboelz)).
+- Initial support for at rules.
+
 ## 0.3.0
 
 - Basic support for CSS attributes.
