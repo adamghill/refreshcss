@@ -10,8 +10,6 @@ SELECTOR_BREAKABLE_CHARACTER = {
     "{",
     "}",
     ":",
-    # "@",
-    # ";",
 }
 PORTION_BREAKING_CHARACTERS = {
     ".",
@@ -149,11 +147,16 @@ class Rule:
         rule_length = len(self.value)
         char_idx = 0
         starting_idx = 0
+        inside_at_rule = False
 
         while rule_length - 1 >= char_idx:
             c = self.value[char_idx]
 
-            if c in SELECTOR_BREAKABLE_CHARACTER:
+            if c == "@":
+                inside_at_rule = True
+            elif inside_at_rule and c == ";":
+                inside_at_rule = False
+            elif not inside_at_rule and c in SELECTOR_BREAKABLE_CHARACTER:
                 css_rule_portion = self.value[starting_idx:char_idx].strip()
 
                 # Remove extraneous commas
@@ -175,35 +178,32 @@ class Rule:
         return _selectors
 
     @property
-    def ats(self) -> set[At]:
-        """All at-rules used in the rule."""
-
-        _ats: set[At] = set()
+    def at(self) -> At | None:
+        """At-rule for the rule."""
 
         rule_length = len(self.value)
         char_idx = 0
         starting_idx = 0
-        inside_at_rule = False
+        bracket_count = 0
 
         while rule_length - 1 >= char_idx:
             c = self.value[char_idx]
 
-            if c in "@":
-                inside_at_rule = True
-                starting_idx = char_idx
+            if c == ";":
+                css_rule_portion = self.value[starting_idx : char_idx + 1].strip()
+
+                return At(css_rule_portion)
+            elif c == "{":
+                bracket_count += 1
+            elif c == "}":
+                bracket_count -= 1
+
+                if bracket_count == 0:
+                    css_rule_portion = self.value[starting_idx : char_idx + 1].strip()
+
+                    return At(css_rule_portion)
 
             char_idx += 1
-
-            if c in ";":
-                inside_at_rule = False
-
-                css_rule_portion = self.value[starting_idx : char_idx + 1].strip()
-                _ats.add(At(css_rule_portion))
-
-            if inside_at_rule:
-                continue
-
-        return _ats
 
     def __str__(self) -> str:
         return self.value

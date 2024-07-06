@@ -199,3 +199,29 @@ def test_at_rule():
     actual = Rule('@charset "utf-8";').selectors
 
     assert expected == actual
+
+
+def test_nested_at_rule():
+    # nested @ rules should not show up in selectors
+
+    expected = set()
+
+    actual = Rule("@media screen and (min-width: 1024px) { .container { max-width:960px } }").selectors
+
+    assert expected == actual
+
+
+def test_root_psuedo_class():
+    # :root should not show up in selectors
+
+    expected = set()
+
+    actual = Rule(
+        """:root {
+  --bulma-scheme-h: 221;
+  --bulma-scheme-s: 14%;
+  --bulma-shadow: 0 0.5em 1em -0.125em hsla(var(--bulma-shadow-h), var(--bulma-shadow-s), var(--bulma-shadow-l), 0.1), 0 0px 0 1px hsla(var(--bulma-shadow-h), var(--bulma-shadow-s), var(--bulma-shadow-l), 0.02);
+}"""
+    ).selectors
+
+    assert expected == actual

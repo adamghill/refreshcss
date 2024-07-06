@@ -1,3 +1,4 @@
+import re
 from dataclasses import dataclass
 
 
@@ -17,6 +18,13 @@ class At:
     @property
     def internal_rule(self) -> str:
         if self.is_nested:
-            raise NotImplementedError()
+            internal_rule = re.sub("@.*?{", "", self.value)
+            last_bracket_idx = internal_rule.rindex("}")
+            internal_rule = internal_rule[0:last_bracket_idx].strip()
+
+            # Import here to avoid circular imports
+            from refreshcss.css.rule import Rule
+
+            return Rule(internal_rule)
 
         raise AttributeError("Regular at-rules do not have an internal rule")

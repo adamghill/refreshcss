@@ -33,6 +33,7 @@ from refreshcss.utils import read_text
 @click.version_option()
 def cli(output: TextIO, recursive: bool, encoding: Optional[str], css: Path, html: tuple[str]):  # noqa FBT001
     """Remove classes, ids, and element selectors not used in HTML from CSS."""
+
     try:
         css_text = read_text(css, encoding=encoding)
     except (ValueError, UnicodeDecodeError) as e:
@@ -42,5 +43,7 @@ def cli(output: TextIO, recursive: bool, encoding: Optional[str], css: Path, htm
 
     site = FilesSite(html, recursive, encoding)
     site.parse()
-    refresh_css = RefreshCSS(site)
-    output.write(refresh_css.clean(css_text))
+
+    cleaned_css = RefreshCSS(site).clean(css_text)
+
+    output.write(cleaned_css)
