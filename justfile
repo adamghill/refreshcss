@@ -20,7 +20,7 @@ setup:
 # Update the project
 update:
   just lock
-  poetry install
+  poetry install -E cli
 
 # Lock the dependencies
 lock:
