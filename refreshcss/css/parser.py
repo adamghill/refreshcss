@@ -2,7 +2,7 @@ import re
 
 from refreshcss.css.rule import Rule
 from refreshcss.html.site import Site
-from refreshcss.strings import finditer, remove_string_at
+from refreshcss.utils.string import finditer, remove_string_at
 
 CSS_RULE_RE = re.compile(r"(([^{])+)\s*\{.*?\}", flags=re.DOTALL)
 CSS_COMMENTS_RE = re.compile(r"/\*.*?\*/", flags=re.DOTALL)

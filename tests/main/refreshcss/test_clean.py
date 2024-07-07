@@ -2,8 +2,7 @@ from os import getcwd
 
 import pytest
 from pytest import MonkeyPatch
-from refreshcss import RefreshCSS
-from refreshcss.html.site import DjangoSite
+from refreshcss import DjangoSite, RefreshCSS
 
 from tests.utils import assert_css
 

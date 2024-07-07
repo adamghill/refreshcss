@@ -1,7 +1,6 @@
 import pytest
 from refreshcss.css.at import At
 from refreshcss.css.rule import Rule
-from refreshcss.css.selector import Selector
 
 
 def test_at_rule():

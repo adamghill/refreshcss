@@ -1,7 +1,7 @@
+from collections.abc import Iterable, Iterator
 from dataclasses import dataclass, field
 from functools import cached_property
 from pathlib import Path
-from typing import Iterable, Iterator, Optional
 
 from refreshcss.html.file import File
 
@@ -13,7 +13,7 @@ class Site:
     ids: set = field(default_factory=set, init=False)
 
     @property
-    def encoding(self) -> Optional[str]:
+    def encoding(self) -> str | None:
         return None
 
     def get_template_paths(self):
@@ -38,8 +38,9 @@ class Site:
 @dataclass
 class DjangoSite(Site):
     @cached_property
-    def encoding(self) -> Optional[str]:
+    def encoding(self) -> str | None:
         from django.conf import settings
+
         return settings.DEFAULT_CHARSET
 
     def get_template_paths(self) -> list[Path]:
@@ -82,26 +83,17 @@ class UrlSite(Site):
 
 
 @dataclass
-class DirectorySite(Site):
-    """A site that is represented by a directory."""
+class PathSite(Site):
+    """A site that is represented by a list of paths."""
 
-    def get_template_paths(self) -> list[Path]:
-        """Get template paths for the directory."""
-
-        raise NotImplementedError()
-
-
-@dataclass
-class FilesSite(Site):
-    """A site that is represented by a list or tuple of files."""
-
-    files: Iterable[str] = field(default_factory=list)
+    paths: Iterable[str] = field(default_factory=list)
     recursive: bool = field(default=False)
-    encoding: Optional[str] = field(default=None)
+    encoding: str | None = field(default=None)
 
     def get_template_paths(self) -> Iterator[Path]:
-        for file in self.files:
-            path = Path(file)
+        for path_str in self.paths:
+            path = Path(path_str)
+
             if self.recursive:
                 try:
                     yield from (p for p in path.rglob("*") if p.is_file())

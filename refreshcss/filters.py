@@ -1,7 +1,8 @@
 from compressor.filters import CallbackOutputFilter
 from django.core.cache import cache
 
-from refreshcss import DjangoSite, RefreshCSS
+from refreshcss.html.site import DjangoSite
+from refreshcss.main import RefreshCSS
 
 REFRESH_CSS_SITE_CACHE_KEY = "refreshcss:site"
 

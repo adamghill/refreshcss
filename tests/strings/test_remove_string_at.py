@@ -1,4 +1,4 @@
-from refreshcss.strings import remove_string_at
+from refreshcss.utils.string import remove_string_at
 
 
 def test_remove_string_at():

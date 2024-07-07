@@ -1,4 +1,4 @@
-from refreshcss.strings import finditer
+from refreshcss.utils.string import finditer
 
 
 def test_finditer():

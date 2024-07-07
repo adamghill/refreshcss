@@ -3,9 +3,9 @@ from typing import Optional, TextIO
 
 import click
 
-from refreshcss.html.site import FilesSite
+from refreshcss.html.site import PathSite
 from refreshcss.main import RefreshCSS
-from refreshcss.utils import read_text
+from refreshcss.utils.path import read_text
 
 
 @click.command()
@@ -41,7 +41,7 @@ def cli(output: TextIO, recursive: bool, encoding: Optional[str], css: Path, htm
     except LookupError as e:
         raise click.BadParameter(str(e), param_hint="encoding") from e
 
-    site = FilesSite(html, recursive, encoding)
+    site = PathSite(html, recursive, encoding)
     site.parse()
 
     cleaned_css = RefreshCSS(site).clean(css_text)

@@ -1,8 +1,8 @@
 from refreshcss.cli import cli
-from refreshcss.html.site import DjangoSite
+from refreshcss.html.site import DjangoSite, PathSite
 from refreshcss.main import RefreshCSS
 
-__all__ = ["RefreshCSS", "DjangoSite"]
+__all__ = ["RefreshCSS", "DjangoSite", "PathSite"]
 
 
 if __name__ == "__main__":

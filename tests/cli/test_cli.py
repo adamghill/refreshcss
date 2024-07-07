@@ -1,11 +1,11 @@
 from pathlib import Path
 
 from click.testing import CliRunner
-
 from refreshcss.cli import cli
+
 from tests.utils import assert_css
 
-expected = """\
+expected = """
 td div.pos {
     color: green;
     width: 20px;
@@ -54,6 +54,7 @@ td div.neg {
 
 def test_cli():
     runner = CliRunner()
+
     result = runner.invoke(
         cli,
         [
@@ -62,15 +63,14 @@ def test_cli():
             "tests/templates/index.html",
         ],
     )
+
     assert result.exit_code == 0
     assert_css(expected, result.output)
 
 
 def test_cli_recursive():
     runner = CliRunner()
-    result = runner.invoke(
-        cli, ["--recursive", "tests/static/css/styles.css", "tests/templates/"]
-    )
+    result = runner.invoke(cli, ["--recursive", "tests/static/css/styles.css", "tests/templates/"])
     assert result.exit_code == 0
     assert_css(expected, result.output)
 
@@ -87,6 +87,7 @@ def test_cli_encoding():
             "tests/templates/",
         ],
     )
+
     assert result.exit_code == 0
     assert_css(expected, result.output)
 
@@ -103,6 +104,7 @@ def test_cli_invalid_encoding():
             "tests/templates/",
         ],
     )
+
     assert result.exit_code == 2
     assert "Error: Invalid value for encoding" in result.output
 
@@ -110,6 +112,7 @@ def test_cli_invalid_encoding():
 def test_cli_output_file():
     runner = CliRunner()
     base_path = Path.cwd()
+
     with runner.isolated_filesystem():
         result = runner.invoke(
             cli,
@@ -121,5 +124,6 @@ def test_cli_output_file():
                 f"{base_path}/tests/templates/",
             ],
         )
+
         assert result.exit_code == 0
         assert_css(expected, Path("output.css").read_text(encoding="utf-8"))
