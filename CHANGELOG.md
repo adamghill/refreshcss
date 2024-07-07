@@ -1,7 +1,12 @@
+## 0.5.0
+
+- Restructure internal code to make it easier to use as a library.
+
 ## 0.4.0
 
 - Add CLI by ([#18](https://github.com/adamghill/refreshcss/pull/18) by [tobiasmboelz](https://github.com/tobiasmboelz)).
-- Initial support for at rules.
+- Support for parsing root pseudo-class.
+- Support for parsing at-rules.
 
 ## 0.3.0
 

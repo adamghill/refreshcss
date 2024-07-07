@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "refreshcss"
-version = "0.4.0"
+version = "0.5.0"
 description = "Removes unused classes, ids, and element selectors from CSS."
 authors = ["adamghill <adamghill@yahoo.com>"]
 license = "MIT"
@@ -15,6 +15,7 @@ keywords = ["django", "python", "css", "html"]
 
 [tool.poetry.dependencies]
 python = "^3.10"
+# cli extras
 click = { version = "^8.1.7", optional = true }
 charset-normalizer = {version = "^3.3.2", optional = true}
 
