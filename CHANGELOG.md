@@ -1,3 +1,7 @@
+## 0.5.1
+
+- Allow programmatic use without installing `click` ([#23](https://github.com/adamghill/refreshcss/pull/23) by [Tobi-De](https://github.com/Tobi-De)).
+
 ## 0.5.0
 
 - Restructure internal code to make it easier to use as a library.
