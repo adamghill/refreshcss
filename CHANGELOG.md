@@ -1,3 +1,9 @@
+## 0.6.0
+
+- Much better modern CSS support via `tinycss2`.
+- Use `justhtml` for parsing HTML.
+- Much improved performance.
+
 ## 0.5.1
 
 - Allow programmatic use without installing `click` ([#23](https://github.com/adamghill/refreshcss/pull/23) by [Tobi-De](https://github.com/Tobi-De)).

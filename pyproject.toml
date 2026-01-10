@@ -1,6 +1,6 @@
 [project]
 name = "refreshcss"
-version = "0.5.1"
+version = "0.6.0"
 description = "Removes unused classes, ids, and element selectors from CSS."
 authors = [
     { name = "adamghill", email = "adamghill@yahoo.com" }
