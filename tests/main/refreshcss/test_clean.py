@@ -205,9 +205,27 @@ def test_clean_bulma_4(monkeypatch):
     assert_css(expected, actual)
 
 
-@pytest.mark.skip()
 def test_clean_bulma_1_0_full(monkeypatch: MonkeyPatch):
-    expected = ""
+    expected = """@charset "UTF-8";
+/*! bulma.io v1.0.0 | MIT License | github.com/jgthms/bulma */
+/* Bulma Utilities */
+:root {
+  --bulma-control-radius: var(--bulma-radius);
+  --bulma-control-radius-small: var(--bulma-radius-small);
+  --bulma-control-border-width: 1px;
+  --bulma-control-height: 2.5em;
+  --bulma-control-line-height: 1.5;
+  --bulma-control-padding-vertical: calc(0.5em - 1px);
+  --bulma-control-padding-horizontal: calc(0.75em - 1px);
+  --bulma-control-size: var(--bulma-size-normal);
+  --bulma-control-focus-shadow-l: 50%;
+}
+/* Bulma Themes */
+:root {
+  --bulma-scheme-h: 221;
+  --bulma-scheme-s: 14%;
+  --bulma-shadow: 0 0.5em 1em -0.125em hsla(var(--bulma-shadow-h), var(--bulma-shadow-s), var(--bulma-shadow-l), 0.1), 0 0px 0 1px hsla(var(--bulma-shadow-h), var(--bulma-shadow-s), var(--bulma-shadow-l), 0.02);
+}"""
 
     site = _get_django_site(monkeypatch, classes={"px-2"}, elements={"pre"})
 

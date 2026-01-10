@@ -1,5 +1,6 @@
 # ruff: noqa: T201
 
+
 from refreshcss.html.site import Site
 
 
