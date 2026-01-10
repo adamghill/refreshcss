@@ -8,23 +8,23 @@ _default:
   
 # Install dependencies
 bootstrap:
-  poetry install
+  uv sync
 
 # Set up the project
 setup:
   brew install pipx
   pipx ensurepath
-  pipx install poetry
+  pipx install uv
   pipx install ruff
 
 # Update the project
 update:
   just lock
-  poetry install -E cli
+  uv sync --extra cli
 
 # Lock the dependencies
 lock:
-  poetry lock
+  uv lock
 
 # Lint the project
 lint *ARGS='.':
@@ -32,21 +32,21 @@ lint *ARGS='.':
 
 # Check the types in the project
 type *ARGS='':
-  -poetry run mypy {{ ARGS }}  # need to run through poetry to see installed dependencies
+  -uv run ty check {{ ARGS }}
 
 # Benchmark the project
 benchmark:
-  -poetry run pytest tests/benchmarks/ --benchmark-only --benchmark-compare
+  -uv run pytest tests/benchmarks/ --benchmark-only --benchmark-compare
 
 # Run the tests
 test *ARGS='':
-  -poetry run pytest {{ ARGS }}
+  -uv run pytest {{ ARGS }}
 
 alias t := test
 
 # Run coverage on the code
 coverage:
-  -poetry run pytest --cov=refreshcss
+  -uv run pytest --cov=refreshcss
 
 # Run all the dev things
 dev:
@@ -56,9 +56,9 @@ dev:
 
 # Build the package
 build:
-  poetry build
+  uv build
 
 # Build and publish the package to test PyPI and prod PyPI
 publish:
-  poetry publish --build -r test
-  poetry publish
+  uv publish --publish-url https://test.pypi.org/legacy/
+  uv publish
