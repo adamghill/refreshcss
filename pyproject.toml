@@ -21,6 +21,7 @@ classifiers = [
 ]
 
 dependencies = [
+    "justhtml>=0.32.0",
     "tinycss2>=1.5.1",
 ]
 
