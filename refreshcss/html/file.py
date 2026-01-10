@@ -3,11 +3,9 @@ from dataclasses import dataclass
 from functools import cached_property
 from pathlib import Path
 
-from refreshcss.utils.path import read_text
+from justhtml.parser import FragmentContext, JustHTML
 
-ID_RE = re.compile(r"<([\w-]+)\s+[^>]*id=(?P<id>[^>]+)")
-ELEMENT_RE = re.compile(r"<(?P<element>[\w-]+)")
-CLASS_RE = re.compile(r"<[\w-]+\s+[^>]*class=(?P<class>[^>]+)")
+from refreshcss.utils.path import read_text
 
 DJANGO_STATEMENT_RE = re.compile(r"\{\%.*?\%\}")
 DJANGO_VARIABLE_RE = re.compile(r"\{\{.*?\}\}")
@@ -30,12 +28,44 @@ class File:
         return read_text(self.path, encoding=self.encoding)
 
     @cached_property
+    def _dom(self):
+        # Pre-process text to remove Django tags, which can confuse the HTML parser
+        # (especially in attributes with nested quotes)
+        clean_text = self.text
+        clean_text = re.sub(DJANGO_STATEMENT_RE, " ", clean_text)
+        clean_text = re.sub(DJANGO_VARIABLE_RE, " ", clean_text)
+
+        # Heuristic: if it looks like a full document, parse as document
+        text_lower = clean_text.lower()
+        if "<html" in text_lower or "<!doctype" in text_lower:
+            return JustHTML(clean_text, track_node_locations=True)
+
+        # Otherwise parse as fragment (avoids auto-adding html/head/body)
+        ctx = FragmentContext("body")
+        return JustHTML(clean_text, fragment_context=ctx, track_node_locations=True)
+
+    def _walk(self, node):
+        yield node
+        # Ensure we iterate children safely if they exist
+        if getattr(node, "children", None):
+            for child in node.children:
+                yield from self._walk(child)
+
+    @cached_property
     def elements(self):
         _elements = set()
 
-        for match in re.finditer(ELEMENT_RE, self.text):
-            element = match.group("element").strip()
-            _elements.add(element)
+        # Iterate all nodes
+        for node in self._walk(self._dom.root):
+            if hasattr(node, "name") and node.name:
+                # Filter out special nodes and IMPLICIT nodes (no origin line)
+                name = str(node.name)
+                origin_line = getattr(node, "origin_line", None)
+
+                # html node often lacks origin_line even if explicit, so we whitelist it
+                if not name.startswith("#") and not name.startswith("!"):
+                    if name == "html" or origin_line is not None:
+                        _elements.add(name)
 
         return _elements
 
@@ -43,28 +73,18 @@ class File:
     def classes(self):
         _classes = set()
 
-        for match in re.finditer(CLASS_RE, self.text):
-            css_class = match.group("class").strip()
-            css_class = re.sub(DJANGO_STATEMENT_RE, "", css_class)
-            css_class = re.sub(DJANGO_VARIABLE_RE, "", css_class)
+        for node in self._walk(self._dom.root):
+            # Check for attrs existence safely
+            attrs = getattr(node, "attrs", None)
+            if attrs and "class" in attrs:
+                css_class = attrs["class"]
+                if not css_class:
+                    continue
 
-            potential_class_attribute_value = css_class
-
-            if css_class.startswith("'"):
-                matching_single_quote = css_class.index("'", 1)
-
-                potential_class_attribute_value = css_class[1:matching_single_quote]
-            elif css_class.startswith('"'):
-                matching_double_quote = css_class.index('"', 1)
-
-                potential_class_attribute_value = css_class[1:matching_double_quote]
-            else:
-                # Assume that a space means it's a new attribute
-                potential_class_attribute_value = css_class.split(" ")[0]
-
-            for c in potential_class_attribute_value.split(" "):
-                if c:
-                    _classes.add(c)
+                # Django tags are already cleaned in _dom pre-processing.
+                for c in css_class.split():
+                    if c:
+                        _classes.add(c)
 
         return _classes
 
@@ -72,28 +92,18 @@ class File:
     def ids(self):
         _ids = set()
 
-        for match in re.finditer(ID_RE, self.text):
-            css_id = match.group("id").strip()
-            css_id = re.sub(DJANGO_STATEMENT_RE, "", css_id)
-            css_id = re.sub(DJANGO_VARIABLE_RE, "", css_id)
+        for node in self._walk(self._dom.root):
+            # Check for attrs existence safely
+            attrs = getattr(node, "attrs", None)
+            if attrs and "id" in attrs:
+                css_id = attrs["id"]
+                if not css_id:
+                    continue
 
-            potential_id_attribute_value = css_id
-
-            if css_id.startswith("'"):
-                matching_single_quote = css_id.index("'", 1)
-
-                potential_id_attribute_value = css_id[1:matching_single_quote]
-            elif css_id.startswith('"'):
-                matching_double_quote = css_id.index('"', 1)
-
-                potential_id_attribute_value = css_id[1:matching_double_quote]
-            else:
-                # Assume that a space means it's a new attribute
-                potential_id_attribute_value = css_id.split(" ")[0]
-
-            for c in potential_id_attribute_value.split(" "):
-                if c:
-                    _ids.add(c)
+                # Django tags are already cleaned in _dom pre-processing.
+                for c in css_id.split():
+                    if c:
+                        _ids.add(c)
 
         return _ids
 
