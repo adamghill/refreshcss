@@ -1,139 +1,126 @@
+import re
+
 import tinycss2
 from tinycss2.ast import AtRule, QualifiedRule
 
 from refreshcss.html.site import Site
 
 
-def _extract_selectors_from_tokens(tokens: list) -> list[tuple[set[str], set[str], set[str]]]:
+def _rule_is_kept(tokens: list, site: Site) -> bool:
     """
-    Extract classes, ids, and elements from selector tokens, grouped by selector.
+    Determine if a rule should be kept by validating its selectors against the site.
 
-    Returns:
-        List of (classes, ids, elements) tuples
+    Optimized to run in a single pass over tokens without allocating intermediate
+    sets or lists for every rule. Short-circuits as soon as a valid selector is found.
     """
-    selector_groups = []
+    # State for the current selector being processed
+    is_selector_valid = True
+    has_specific_matchers = False
+    current_elements = set()  # Lazily allocated only if needed? Set is needed for O(1) checks?
+    # Actually intersection is fast. We typically have 0-1 elements.
+    # Using a set is fine, it's small.
 
-    current_classes = set()
-    current_ids = set()
-    current_elements = set()
-
-    # State flags
+    # State flags for token parsing
     is_class = False
     expect_element = True  # True at start or after combinator
 
-    # We need to split by comma first to group selectors
-    # But tokens is a flat list. We iterate and flush on comma.
-
     for token in tokens:
         if token.type == "literal" and token.value == ",":
-            # Flush current group
-            selector_groups.append((current_classes, current_ids, current_elements))
-            current_classes = set()
-            current_ids = set()
-            current_elements = set()
+            # End of current selector. Check if it's valid.
+            if is_selector_valid:
+                # If we have specific matchers (classes/ids), elements are ignored unless none present
+                # If no specific matchers, we check elements
+                if has_specific_matchers:
+                    return True  # Kept!
+
+                # Check elements
+                # Logic: if no specific matchers, check elements against site.elements
+                keep_element = True
+                if current_elements and "*" not in current_elements:
+                    if not site.elements or not (current_elements & site.elements):
+                        keep_element = False
+
+                # Also if no selectors at all (empty?), we treat as valid/keep?
+                # Logic from before: "If rule has no selectors we can identify, keep it"
+
+                if keep_element:
+                    return True
+
+            # Reset for next selector
+            is_selector_valid = True
+            has_specific_matchers = False
+            current_elements.clear()
             is_class = False
             expect_element = True
             continue
 
+        # If already invalid, we can just skip tokens until comma?
+        # But we need to parse correctly to find the comma.
+        # Use a flag to "skip_until_comma"?
+        # Tokenizer is flat, so we just continue iterating.
+
+        if not is_selector_valid:
+            continue
+
         if token.type == "whitespace":
-            # Whitespace is a descendant combinator provided it's not trimming
-            # But specific combinators > + ~ also reset expect_element
             expect_element = True
             is_class = False
             continue
 
         if token.type == "literal":
-            if token.value == ".":
+            val = token.value
+            if val == ".":
                 is_class = True
-                expect_element = False  # Class cannot be an element
-            elif token.value in (">", "+", "~", "*"):
+                expect_element = False
+            elif val in (">", "+", "~", "*"):
                 is_class = False
                 expect_element = True
-            elif token.value == "*":
-                # Universal selector is an element-like thing but we treat it loosely
-                # It usually resets specific element expectation but we don't capture * as element
+            elif val == "*":
+                current_elements.add("*")
                 expect_element = False
             else:
-                # Other literals like : or [ start pseudo/attributes
-                # We stop expecting element/class until next space/combinator?
-                # Actually, `div:hover` -> element `div`.
-                # `.foo:hover` -> class `foo`.
-                # So we just turn off our flags.
+                # Other syntax (prefixes, etc)
                 is_class = False
                 expect_element = False
 
         elif token.type == "ident":
+            val = token.value
             if is_class:
-                current_classes.add(token.value)
+                # Check class usage immediately
+                has_specific_matchers = True
+                if not site.classes or val not in site.classes:
+                    is_selector_valid = False
                 is_class = False
+
             elif expect_element:
-                # It's an element
-                current_elements.add(token.value)
-                expect_element = False  # specific element found, don't find another until combinator
+                current_elements.add(val)
+                expect_element = False
             else:
-                # Ident in other context (e.g. inside attribute? no tokens are flat)
-                # pseudo-class name? (after :)
                 pass
 
         elif token.type == "hash":
-            # hash token is always an ID
-            current_ids.add(token.value)
+            # ID
+            val = token.value
+            has_specific_matchers = True
+            if not site.ids or val not in site.ids:
+                is_selector_valid = False
             expect_element = False
 
         else:
-            # Other tokens (blocks [], functions (), etc)
             is_class = False
-            pass
 
-    # Flush last group
-    selector_groups.append((current_classes, current_ids, current_elements))
-
-    return selector_groups
-
-
-def _should_keep_rule(selector_groups: list[tuple[set[str], set[str], set[str]]], site: Site) -> bool:
-    """
-    Determine if a rule should be kept based on whether its selectors are used.
-
-    A rule is kept if ANY of its comma-separated selectors are valid.
-    A selector is valid if ALL of its specific parts (classes, ids) match.
-    Element parts are only checked if there are no classes or ids in the selector.
-    """
-    for classes, ids, elements in selector_groups:
-        is_selector_valid = True
-        has_specific_matchers = False
-
-        # Check classes
-        if classes:
-            has_specific_matchers = True
-            if not site.classes or not classes.issubset(site.classes):
-                is_selector_valid = False
-
-        # Check ids
-        if ids and is_selector_valid:
-            has_specific_matchers = True
-            if not site.ids or not ids.issubset(site.ids):
-                is_selector_valid = False
+    # Check the last selector (after loop finishes)
+    if is_selector_valid:
+        if has_specific_matchers:
+            return True
 
         # Check elements
-        if elements and is_selector_valid:
-            # Only check elements if we don't have specific matchers (classes/ids)
-            # This allows rules like ".table th" to be kept even if "th" is unused,
-            # as long as ".table" is used.
-            if not has_specific_matchers:
-                # Special case: keep universal selector
-                if "*" not in elements:
-                    # Check elements against site.elements
-                    # Use intersection (loose) to match legacy behavior where site.elements might be partial
-                    if not site.elements or not (elements & site.elements):
-                        is_selector_valid = False
+        if current_elements and "*" not in current_elements:
+            if not site.elements or not (current_elements & site.elements):
+                return False  # Drop
 
-        # If rule has no selectors we can identify, keep it
-        if not classes and not ids and not elements:
-            is_selector_valid = True
-
-        if is_selector_valid:
-            return True
+        # If no specific and valid elements (or empty), Keep.
+        return True
 
     return False
 
@@ -145,9 +132,7 @@ def _parse_qualified_rule(rule: QualifiedRule, site: Site) -> str | None:
     Returns:
         CSS text if rule should be kept, None otherwise
     """
-    selector_groups = _extract_selectors_from_tokens(rule.prelude)
-
-    if _should_keep_rule(selector_groups, site):
+    if _rule_is_kept(rule.prelude, site):
         return tinycss2.serialize([rule])
 
     return None
@@ -242,8 +227,7 @@ def parse(css_text: str, site: Site) -> str:
     # Join all kept rules
     result = "\n".join(kept_css)
 
-    # Clean up excessive newlines
-    while "\n\n\n" in result:
-        result = result.replace("\n\n\n", "\n\n")
+    # Clean up excessive newlines efficiently
+    result = re.sub(r"\n{3,}", "\n\n", result)
 
     return result
