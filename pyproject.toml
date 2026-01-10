@@ -20,7 +20,9 @@ classifiers = [
     "Programming Language :: Python :: 3.13",
 ]
 
-dependencies = []
+dependencies = [
+    "tinycss2>=1.5.1",
+]
 
 [project.optional-dependencies]
 cli = [

@@ -503,6 +503,9 @@ wheels = [
 name = "refreshcss"
 version = "0.5.1"
 source = { editable = "." }
+dependencies = [
+    { name = "tinycss2" },
+]
 
 [package.optional-dependencies]
 cli = [
@@ -530,6 +533,7 @@ dev = [
 requires-dist = [
     { name = "charset-normalizer", marker = "extra == 'cli'", specifier = ">=3.3.2" },
     { name = "click", marker = "extra == 'cli'", specifier = ">=8.1.7" },
+    { name = "tinycss2", specifier = ">=1.5.1" },
 ]
 provides-extras = ["cli"]
 

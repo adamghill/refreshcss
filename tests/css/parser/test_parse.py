@@ -1,13 +1,12 @@
 from refreshcss.css.parser import parse
-
 from tests.utils import assert_css, get_site
 
 
 def test_parse(monkeypatch):
     expected = """
-body { color: 'blue'; }
+body { color: "blue"; }
 
-.test-1 { color: 'red'; }
+.test-1 { color: "red"; }
 """
 
     css_text = """
@@ -28,9 +27,9 @@ body { color: 'blue'; }
 def test_parse_at_rule(monkeypatch):
     expected = """@charset "UTF-8";
 
-body { color: 'blue'; }
+body { color: "blue"; }
 
-.test-1 { color: 'red'; }
+.test-1 { color: "red"; }
 """
 
     css_text = """@charset "UTF-8";
