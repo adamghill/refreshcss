@@ -36,7 +36,7 @@ def complex_html():
                         </div>
                     </article>
                 </div>
-        
+
                 <aside class="col-md-4 sidebar">
                     <div class="widget">
                         <h3 class="widget-title">Recent Posts</h3>

@@ -10,23 +10,25 @@
 
 ### To use the `refreshcss` library or use the `django-compressor` integration
 
-`pip install refreshcss`
+`uv add refreshcss`
 
 ### To run `refreshcss` on the command-line
 
-`pip install refreshcss[cli]`
+`uvx refreshcss[cli]`
 
 ## ⭐️ Features
 
 - Pure Python (no extra NodeJS build process needed)
-- Filters out unused classes, ids, elements from CSS based on HTML templates
-- Handles Django/Jinja styles HTML templates
-- Can be used as a filter with `django-compressor` to minify CSS as part of the `compress` management command
-- Can be used via command-line interface in CI/CD
+- Fast and spec-compliant CSS and HTML parsing
+- Filters out unused classes, ids, and elements from CSS based on HTML templates
+- Supports modern CSS syntax, including nested rules, container queries, and media queries
+- Handles Django/Jinja-style HTML templates with context-aware extraction
+- Integrates with `django-compressor` to clean CSS during the `compress` command
+- Command-line interface for use in CI/CD pipelines
 
 ### ⌨️ Command-line interface
 
-> Make sure that the `cli` extra is installed first: `pip install refreshcss[cli]`.
+`uvx refreshcss[cli]`
 
 ```sh
 Usage: refreshcss [OPTIONS] CSS HTML...
@@ -77,7 +79,7 @@ def clean_css(css_path: Path):
 
 1. Catalogue classes, ids, and elements that are currently being used in found HTML templates
 1. Catalogue classes, ids, elements, and at-rules in a particular CSS stylesheet
-1. Return new CSS stylesheet that only contains rules that are actively being used by the HTML
+1. Return a new CSS stylesheet that only contains rules that are actively being used by the HTML
 
 ## 🧐 Why?
 
