@@ -1,8 +1,8 @@
 from pathlib import Path
 
 from click.testing import CliRunner
-from refreshcss.cli import cli
 
+from refreshcss.cli import cli
 from tests.utils import assert_css
 
 expected = """
@@ -40,7 +40,7 @@ td div.neg {
     font-weight: normal;
     }
 .info::before {
-    content: '\\27AF  ';
+    content: "➯ ";
     }
 .digital-ocean {
     float: right;

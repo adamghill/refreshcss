@@ -2,8 +2,8 @@ from os import getcwd
 
 import pytest
 from pytest import MonkeyPatch
-from refreshcss import DjangoSite, RefreshCSS
 
+from refreshcss import DjangoSite, RefreshCSS
 from tests.utils import assert_css
 
 
@@ -62,7 +62,7 @@ td div.neg {
     font-weight: normal;
     }
 .info::before {
-    content: '\\27AF  ';
+    content: "➯ ";
     }
 .digital-ocean {
     float: right;
