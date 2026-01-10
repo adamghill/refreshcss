@@ -12,47 +12,81 @@ def _extract_selectors_from_tokens(tokens: list) -> list[tuple[set[str], set[str
         List of (classes, ids, elements) tuples
     """
     selector_groups = []
-    selector_text = tinycss2.serialize(tokens).strip()
 
-    # Split by commas for multiple selectors
-    for raw_selector in selector_text.split(","):
-        selector = raw_selector.strip()
-        classes = set()
-        ids = set()
-        elements = set()
+    current_classes = set()
+    current_ids = set()
+    current_elements = set()
 
-        # Extract classes (anything after a dot)
-        for part in selector.split():
-            if "." in part:
-                # Handle cases like "div.class" or ".class"
-                class_parts = part.split(".")
-                for raw_class_name in class_parts[1:]:  # Skip first part (element or empty)
-                    # Clean up pseudo-classes, pseudo-elements, and attribute selectors
-                    class_name = raw_class_name.split(":")[0].split("[")[0]
-                    if class_name:
-                        classes.add(class_name)
+    # State flags
+    is_class = False
+    expect_element = True  # True at start or after combinator
 
-            if "#" in part:
-                # Handle cases like "div#id" or "#id"
-                id_parts = part.split("#")
-                for raw_id_name in id_parts[1:]:
-                    # Clean up pseudo-classes and attribute selectors
-                    id_name = raw_id_name.split(":")[0].split("[")[0]
-                    if id_name:
-                        ids.add(id_name)
+    # We need to split by comma first to group selectors
+    # But tokens is a flat list. We iterate and flush on comma.
 
-        # Extract element selectors (simple heuristic)
-        # Look for bare words at the start of selectors or after combinators
-        parts = selector.replace(">", " ").replace("+", " ").replace("~", " ").split()
-        for part in parts:
-            # Skip if it starts with . or # or is a pseudo-class/element
-            if part and part[0] not in (".", "#", ":", "[", "*"):
-                # Get just the element name (before any . or # or :)
-                element = part.split(".")[0].split("#")[0].split(":")[0].split("[")[0]
-                if element and element != "*":
-                    elements.add(element)
+    for token in tokens:
+        if token.type == "literal" and token.value == ",":
+            # Flush current group
+            selector_groups.append((current_classes, current_ids, current_elements))
+            current_classes = set()
+            current_ids = set()
+            current_elements = set()
+            is_class = False
+            expect_element = True
+            continue
 
-        selector_groups.append((classes, ids, elements))
+        if token.type == "whitespace":
+            # Whitespace is a descendant combinator provided it's not trimming
+            # But specific combinators > + ~ also reset expect_element
+            expect_element = True
+            is_class = False
+            continue
+
+        if token.type == "literal":
+            if token.value == ".":
+                is_class = True
+                expect_element = False  # Class cannot be an element
+            elif token.value in (">", "+", "~", "*"):
+                is_class = False
+                expect_element = True
+            elif token.value == "*":
+                # Universal selector is an element-like thing but we treat it loosely
+                # It usually resets specific element expectation but we don't capture * as element
+                expect_element = False
+            else:
+                # Other literals like : or [ start pseudo/attributes
+                # We stop expecting element/class until next space/combinator?
+                # Actually, `div:hover` -> element `div`.
+                # `.foo:hover` -> class `foo`.
+                # So we just turn off our flags.
+                is_class = False
+                expect_element = False
+
+        elif token.type == "ident":
+            if is_class:
+                current_classes.add(token.value)
+                is_class = False
+            elif expect_element:
+                # It's an element
+                current_elements.add(token.value)
+                expect_element = False  # specific element found, don't find another until combinator
+            else:
+                # Ident in other context (e.g. inside attribute? no tokens are flat)
+                # pseudo-class name? (after :)
+                pass
+
+        elif token.type == "hash":
+            # hash token is always an ID
+            current_ids.add(token.value)
+            expect_element = False
+
+        else:
+            # Other tokens (blocks [], functions (), etc)
+            is_class = False
+            pass
+
+    # Flush last group
+    selector_groups.append((current_classes, current_ids, current_elements))
 
     return selector_groups
 

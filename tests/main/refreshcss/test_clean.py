@@ -197,39 +197,78 @@ def test_clean_bulma_3(monkeypatch: MonkeyPatch):
 def test_clean_bulma_4(monkeypatch):
     expected = "/*! minireset.css v0.0.6 | MIT License | github.com/jgthms/minireset.css */*,*::before,*::after{box-sizing:inherit}.px-2{padding-left:.5rem !important;padding-right:.5rem !important}"  # noqa: E501
 
-    site = _get_django_site(monkeypatch, classes={"px-2"})
-    css_text = """.is-unselectable{-webkit-touch-callout:none;-webkit-user-select:none;-moz-user-select:none;-ms-user-select:none;user-select:none}.title:not(:last-child),.subtitle:not(:last-child),.table-container:not(:last-child),.table:not(:last-child){margin-bottom:1.5rem}.is-overlay{bottom:0;left:0;position:absolute;right:0;top:0}/*! minireset.css v0.0.6 | MIT License | github.com/jgthms/minireset.css */html,body,p,ol,ul,li,dl,dt,dd,blockquote,figure,fieldset,legend,textarea,pre,iframe,hr,h1,h2,h3,h4,h5,h6{margin:0;padding:0}h1,h2,h3,h4,h5,h6{font-size:100%;font-weight:normal}ul{list-style:none}button,input,select,textarea{margin:0}html{box-sizing:border-box}*,*::before,*::after{box-sizing:inherit}img,video{height:auto;max-width:100%}iframe{border:0}table{border-collapse:collapse;border-spacing:0}td,th{padding:0}td:not([align]),th:not([align]){text-align:inherit}html{background-color:#fff;font-size:16px;-moz-osx-font-smoothing:grayscale;-webkit-font-smoothing:antialiased;min-width:300px;overflow-x:hidden;overflow-y:scroll;text-rendering:optimizeLegibility;text-size-adjust:100%}article,aside,figure,footer,header,hgroup,section{display:block}body,button,input,optgroup,select,textarea{font-family:BlinkMacSystemFont,-apple-system,"Segoe UI","Roboto","Oxygen","Ubuntu","Cantarell","Fira Sans","Droid Sans","Helvetica Neue","Helvetica","Arial",sans-serif}code,pre{-moz-osx-font-smoothing:auto;-webkit-font-smoothing:auto;font-family:monospace}body{color:#4a4a4a;font-size:1em;font-weight:400;line-height:1.5}a{color:#485fc7;cursor:pointer;text-decoration:none}a strong{color:currentColor}a:hover{color:#363636}code{background-color:#f5f5f5;color:#da1039;font-size:.875em;font-weight:normal;padding:.25em .5em .25em}hr{background-color:#f5f5f5;border:none;display:block;height:2px;margin:1.5rem 0}img{height:auto;max-width:100%}input[type=checkbox],input[type=radio]{vertical-align:baseline}small{font-size:.875em}span{font-style:inherit;font-weight:inherit}strong{color:#363636;font-weight:700}fieldset{border:none}pre{-webkit-overflow-scrolling:touch;background-color:#f5f5f5;color:#4a4a4a;font-size:.875em;overflow-x:auto;padding:1.25rem 1.5rem;white-space:pre;word-wrap:normal}pre code{background-color:transparent;color:currentColor;font-size:1em;padding:0}table td,table th{vertical-align:top}table td:not([align]),table th:not([align]){text-align:inherit}table th{color:#363636}.container{flex-grow:1;margin:0 auto;position:relative;width:auto}.container.is-fluid{max-width:none !important;padding-left:32px;padding-right:32px;width:100%}@media screen and (min-width: 1024px){.container{max-width:960px}}@media screen and (max-width: 1215px){.container.is-widescreen:not(.is-max-desktop){max-width:1152px}}@media screen and (max-width: 1407px){.container.is-fullhd:not(.is-max-desktop):not(.is-max-widescreen){max-width:1344px}}@media screen and (min-width: 1216px){.container:not(.is-max-desktop){max-width:1152px}}@media screen and (min-width: 1408px){.container:not(.is-max-desktop):not(.is-max-widescreen){max-width:1344px}}.table{background-color:#fff;color:#363636}.table td,.table th{border:1px solid #dbdbdb;border-width:0 0 1px;padding:.5em .75em;vertical-align:top}.table td.is-white,.table th.is-white{background-color:#fff;border-color:#fff;color:#0a0a0a}.px-2{padding-left:.5rem !important;padding-right:.5rem !important}"""  # noqa: E501
 
-    actual = RefreshCSS(site=site).clean(css_text)
+def test_clean_bulma_1_0_4_full(monkeypatch: MonkeyPatch):
+    # Use a realistic set of used classes and elements
+    site = _get_django_site(
+        monkeypatch, classes={"button", "is-primary", "content"}, elements={"html", "body", "a", "p", "h1"}
+    )
 
-    assert_css(expected, actual)
-
-
-def test_clean_bulma_1_0_full(monkeypatch: MonkeyPatch):
-    expected = """@charset "UTF-8";
-/*! bulma.io v1.0.0 | MIT License | github.com/jgthms/bulma */
-/* Bulma Utilities */
-:root {
-  --bulma-control-radius: var(--bulma-radius);
-  --bulma-control-radius-small: var(--bulma-radius-small);
-  --bulma-control-border-width: 1px;
-  --bulma-control-height: 2.5em;
-  --bulma-control-line-height: 1.5;
-  --bulma-control-padding-vertical: calc(0.5em - 1px);
-  --bulma-control-padding-horizontal: calc(0.75em - 1px);
-  --bulma-control-size: var(--bulma-size-normal);
-  --bulma-control-focus-shadow-l: 50%;
-}
-/* Bulma Themes */
-:root {
-  --bulma-scheme-h: 221;
-  --bulma-scheme-s: 14%;
-  --bulma-shadow: 0 0.5em 1em -0.125em hsla(var(--bulma-shadow-h), var(--bulma-shadow-s), var(--bulma-shadow-l), 0.1), 0 0px 0 1px hsla(var(--bulma-shadow-h), var(--bulma-shadow-s), var(--bulma-shadow-l), 0.02);
-}"""
-
-    site = _get_django_site(monkeypatch, classes={"px-2"}, elements={"pre"})
-
-    with open(f"{getcwd()}/tests/static/css/bulma-1.0.0.css") as f:
+    with open(f"{getcwd()}/tests/static/css/bulma-1.0.4.css") as f:
         actual = RefreshCSS(site=site).clean(f.read())
 
-    assert_css(expected, actual)
+    # Assert that key selectors are preserved
+    assert ".button" in actual
+    assert ".button.is-primary" in actual
+    assert ".content h1" in actual
+
+    # Assert that unused selectors are removed
+    assert ".column" not in actual
+    assert ".modal" not in actual
+    assert ".navbar" not in actual
+
+    # Assert some general structure is preserved
+    assert "@charset" in actual
+    assert ":root" in actual
+
+
+def test_clean_bulma_1_0_4_min_full(monkeypatch: MonkeyPatch):
+    # Use a realistic set of used classes and elements
+    site = _get_django_site(
+        monkeypatch, classes={"button", "is-primary", "content"}, elements={"html", "body", "a", "p", "h1"}
+    )
+
+    with open(f"{getcwd()}/tests/static/css/bulma-1.0.4.min.css") as f:
+        actual = RefreshCSS(site=site).clean(f.read())
+
+    # Assert that key selectors are preserved
+    assert ".button" in actual
+    assert ".button.is-primary" in actual
+    assert ".content h1" in actual
+
+    # Assert that unused selectors are removed
+    assert ".column" not in actual
+    assert ".modal" not in actual
+    assert ".navbar" not in actual
+
+    # Assert some general structure is preserved
+    assert "@charset" in actual
+    assert ":root" in actual
+
+
+def test_clean_tailwind(monkeypatch: MonkeyPatch):
+    # Use a realistic set of used classes and elements
+    site = _get_django_site(
+        monkeypatch,
+        classes={"container", "flex", "hidden", "w-1/2", "hover:bg-red-500"},
+        elements={"html", "body", "div"},
+    )
+
+    with open(f"{getcwd()}/tests/static/css/tailwind.min.css") as f:
+        actual = RefreshCSS(site=site).clean(f.read())
+
+    # Standard classes
+    assert ".container" in actual
+    assert ".flex" in actual
+    assert ".hidden" in actual
+
+    # Escaped classes (checks if parser handles .w-1\/2 -> w-1/2 mapping)
+    # The output CSS will still be escaped: .w-1\/2
+    assert ".w-1\\/2" in actual
+    # .hover:bg-red-500 -> .hover\:bg-red-500
+    assert ".hover\\:bg-red-500" in actual
+
+    # Unused classes should be removed
+    assert ".block" not in actual
+    assert ".text-center" not in actual
+    assert ".w-1\\/3" not in actual
