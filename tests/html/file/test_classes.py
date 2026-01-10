@@ -29,10 +29,25 @@ def test_classes_from_html(text, expected):
 @pytest.mark.parametrize(
     "text, expected",
     [
-        # this stinks, but not much to do when using regex
         ("<p class='{% if True %}section{% endif %}' style=''>", {"section"}),
-        # this stinks, but not much to do when using regex
-        ("<p class='{{ 'whatever'|upper }} section{% endif %}' style=''>", {"section"}),
+        ("<p class='{{ 'whatever'|upper }} section{% endif %}' style=''>", {"section", "whatever"}),
+        ('<div class="{% block css_class %}default{% endblock %}"></div>', {"default"}),
+        # Literal strings outside of a class attribute should be ignored
+        ("{% sort 'last_commit' %}", set()),
+        # Literal strings inside a template tag that is inside a class attribute should be caught
+        ('<div class="{{ "extra-class"|default:"none" }}"></div>', {"extra-class", "none"}),
+        # Keywords should NO LONGER be filtered out if explicitly quoted in a class attribute
+        ('<div class="{% if "if" %}active{% endif %}"></div>', {"active", "if"}),
+        # Mixed quotes
+        ('<div class="{% if \'test-active\' == "test-active" %}active{% endif %}"></div>', {"active", "test-active"}),
+        # Multiple classes in one tag
+        ('<div class="{% cycle "first" "second" %}"></div>', {"first", "second"}),
+        # Whitespace handling
+        ('<div class="  {% if True %}  active  {% endif %}  "></div>', {"active"}),
+        # Uppercase CLASS attribute
+        ('<div CLASS="{% if True %}uppercase{% endif %}"></div>', {"uppercase"}),
+        # ID attribute
+        ('<div id="{% if True %}main-id{% endif %}"></div>', set()),  # Should be empty for classes property
     ],
 )
 def test_classes_from_django_template_html(text, expected):
@@ -40,6 +55,53 @@ def test_classes_from_django_template_html(text, expected):
     file.text = text
 
     actual = file.classes
+
+    assert expected == actual
+
+
+def test_classes_from_django_block_outside_attribute():
+    # Test that template blocks outside of a class attribute are NOT caught
+    text = '{% block content %}<div class="container"></div>{% endblock %}'
+    file = File(None)
+    file.text = text
+    assert "container" in file.classes
+    assert "content" not in file.classes
+
+
+@pytest.mark.parametrize(
+    "text, expected",
+    [
+        ("<div id='{% if True %}main{% endif %}'></div>", {"main"}),
+        ("<div id='{{ 'unique' }}'></div>", {"unique"}),
+        # Literal strings outside of an id attribute should be ignored
+        ("{% sort 'last_commit' %}", set()),
+    ],
+)
+def test_ids_from_django_template_html(text, expected):
+    file = File(None)
+    file.text = text
+
+    actual = file.ids
+
+    assert expected == actual
+
+
+@pytest.mark.parametrize(
+    "text, expected",
+    [
+        ("<div id='{% if True %}main{% endif %}'></div>", {"main"}),
+        ("<div id='{{ 'unique' }}'></div>", {"unique"}),
+        # ID as class should be ignored in IDs
+        ("<div class='{% if True %}not-an-id{% endif %}'></div>", set()),
+        # Uppercase ID attribute
+        ('<div ID="{% if True %}UPPER-ID{% endif %}"></div>', {"UPPER-ID"}),
+    ],
+)
+def test_ids_from_django_template_html_more(text, expected):
+    file = File(None)
+    file.text = text
+
+    actual = file.ids
 
     assert expected == actual
 

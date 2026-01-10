@@ -9,6 +9,29 @@ from refreshcss.utils.path import read_text
 
 DJANGO_STATEMENT_RE = re.compile(r"\{\%.*?\%\}")
 DJANGO_VARIABLE_RE = re.compile(r"\{\{.*?\}\}")
+TEMPLATE_TAG_RE = re.compile(rf"{DJANGO_STATEMENT_RE.pattern}|{DJANGO_VARIABLE_RE.pattern}")
+
+# Pattern to find potential class names in template tags
+# Matches quoted strings that look like CSS classes
+CLASS_IN_TEMPLATE_RE = re.compile(r'["\']([a-zA-Z_-][a-zA-Z0-9_-]*)["\']')
+
+# Regexes that handle template tags nested inside quotes for class and id attributes
+CLASS_ATTR_RE = re.compile(
+    r"\bclass\s*=\s*("
+    r"\"(?:\{\{.*?\}\}|\{\%.*?\%\}|[^\"])*\""
+    r"|"
+    r"'(?:\{\{.*?\}\}|\{\%.*?\%\}|[^'])*'"
+    r")",
+    re.IGNORECASE | re.DOTALL,
+)
+ID_ATTR_RE = re.compile(
+    r"\bid\s*=\s*("
+    r"\"(?:\{\{.*?\}\}|\{\%.*?\%\}|[^\"])*\""
+    r"|"
+    r"'(?:\{\{.*?\}\}|\{\%.*?\%\}|[^'])*'"
+    r")",
+    re.IGNORECASE | re.DOTALL,
+)
 
 
 @dataclass
@@ -73,6 +96,22 @@ class File:
     def classes(self):
         _classes = set()
 
+        # Step 1: Extract potential classes from template tags/variables
+        # ONLY look inside class attributes to avoid catching literal strings used in filters/tags
+        # that aren't intended to be CSS classes (e.g. filter arguments).
+        for attr_match in CLASS_ATTR_RE.finditer(self.text):
+            # Strip the outer quotes
+            attr_content = attr_match.group(1)[1:-1]
+
+            for tag_match in TEMPLATE_TAG_RE.finditer(attr_content):
+                template_tag = tag_match.group(0)
+
+                # Look for quoted strings that could be class names
+                for class_match in CLASS_IN_TEMPLATE_RE.finditer(template_tag):
+                    _classes.add(class_match.group(1))
+
+        # Step 2: Extract classes from the DOM (STATIC)
+        # ...
         for node in self._walk(self._dom.root):
             # Check for attrs existence safely
             attrs = getattr(node, "attrs", None)
@@ -92,6 +131,20 @@ class File:
     def ids(self):
         _ids = set()
 
+        # Step 1: Extract potential ids from template tags/variables
+        # ONLY look inside id attributes
+        for attr_match in ID_ATTR_RE.finditer(self.text):
+            # Strip the outer quotes
+            attr_content = attr_match.group(1)[1:-1]
+
+            for tag_match in TEMPLATE_TAG_RE.finditer(attr_content):
+                template_tag = tag_match.group(0)
+
+                # Look for quoted strings that could be class names
+                for class_match in CLASS_IN_TEMPLATE_RE.finditer(template_tag):
+                    _ids.add(class_match.group(1))
+
+        # Step 2: Extract ids from the DOM (STATIC)
         for node in self._walk(self._dom.root):
             # Check for attrs existence safely
             attrs = getattr(node, "attrs", None)
